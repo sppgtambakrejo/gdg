@@ -7,16 +7,29 @@ import { supabase } from "./lib/supabaseClient.js";
 const ITEMS = [{"kode": "KH.01.001", "nama": "Beras putih (premium)", "satuan": "kg"}, {"kode": "KH.01.002", "nama": "Beras putih (medium)", "satuan": "kg"}, {"kode": "KH.01.003", "nama": "Beras merah", "satuan": "kg"}, {"kode": "KH.01.004", "nama": "Beras hitam", "satuan": "kg"}, {"kode": "KH.01.005", "nama": "Beras ketan putih", "satuan": "kg"}, {"kode": "KH.01.006", "nama": "Beras ketan hitam", "satuan": "kg"}, {"kode": "KH.01.007", "nama": "Tepung beras", "satuan": "kg"}, {"kode": "KH.01.008", "nama": "Tepung ketan", "satuan": "kg"}, {"kode": "KH.01.009", "nama": "Mie beras", "satuan": "kg"}, {"kode": "KH.01.099", "nama": "Beras dan olahan padi-lainnya", "satuan": "kg"}, {"kode": "KH.02.001", "nama": "Jagung pipil kering", "satuan": "kg"}, {"kode": "KH.02.002", "nama": "Jagung pipil segar", "satuan": "kg"}, {"kode": "KH.02.003", "nama": "Jagung manis segar", "satuan": "kg"}, {"kode": "KH.02.004", "nama": "Beras jagung", "satuan": "kg"}, {"kode": "KH.02.005", "nama": "Jagung giling", "satuan": "kg"}, {"kode": "KH.02.006", "nama": "Tepung jagung (maizena)", "satuan": "kg"}, {"kode": "KH.02.007", "nama": "Tepung jagung lokal (cornmeal)", "satuan": "kg"}, {"kode": "KH.02.099", "nama": "Jagung dan olahan-lainnya", "satuan": "kg"}, {"kode": "KH.03.001", "nama": "Singkong segar", "satuan": "kg"}, {"kode": "KH.03.002", "nama": "Singkong kering/gaplek", "satuan": "kg"}, {"kode": "KH.03.003", "nama": "Tepung singkong (tapioka)", "satuan": "kg"}, {"kode": "KH.03.004", "nama": "Mocaf", "satuan": "kg"}, {"kode": "KH.03.005", "nama": "Ubi jalar putih", "satuan": "kg"}, {"kode": "KH.03.006", "nama": "Ubi jalar kuning/oranye", "satuan": "kg"}, {"kode": "KH.03.007", "nama": "Ubi jalar ungu", "satuan": "kg"}, {"kode": "KH.03.008", "nama": "Kentang", "satuan": "kg"}, {"kode": "KH.03.009", "nama": "Talas", "satuan": "kg"}, {"kode": "KH.03.010", "nama": "Ganyong", "satuan": "kg"}, {"kode": "KH.03.011", "nama": "Sagu basah", "satuan": "kg"}, {"kode": "KH.03.012", "nama": "Tepung sagu", "satuan": "kg"}, {"kode": "KH.03.099", "nama": "Umbi umbian-lainnya", "satuan": "kg"}, {"kode": "KH.04.001", "nama": "Tepung terigu protein rendah", "satuan": "kg"}, {"kode": "KH.04.002", "nama": "Tepung terigu protein sedang", "satuan": "kg"}, {"kode": "KH.04.003", "nama": "Tepung terigu protein tinggi", "satuan": "kg"}, {"kode": "KH.04.004", "nama": "Tepung semolina", "satuan": "kg"}, {"kode": "KH.04.005", "nama": "Mie kering (non-instan)", "satuan": "pak"}, {"kode": "KH.04.006", "nama": "Spageti", "satuan": "pak"}, {"kode": "KH.04.007", "nama": "Makaroni", "satuan": "pak"}, {"kode": "KH.04.008", "nama": "Roti tawar", "satuan": "pak"}, {"kode": "KH.04.009", "nama": "Roti gandum", "satuan": "pak"}, {"kode": "KH.04.010", "nama": "Tepung panir", "satuan": "pak"}, {"kode": "KH.04.011", "nama": "Biskuit", "satuan": "pak"}, {"kode": "KH.04.012", "nama": "Bubur bayi", "satuan": "pak"}, {"kode": "KH.04.099", "nama": "Gandum dan olahan tepung-lainnya", "satuan": "pak"}, {"kode": "KH.05.001", "nama": "Oat (rolled oats)", "satuan": "kg"}, {"kode": "KH.05.002", "nama": "Oat instan", "satuan": "kg"}, {"kode": "KH.05.003", "nama": "Sorgum biji", "satuan": "kg"}, {"kode": "KH.05.004", "nama": "Tepung sorgum", "satuan": "kg"}, {"kode": "KH.05.005", "nama": "Millet/jewawut biji", "satuan": "kg"}, {"kode": "KH.05.006", "nama": "Tepung millet", "satuan": "kg"}, {"kode": "KH.05.099", "nama": "Sereal-lainnya", "satuan": "kg"}, {"kode": "PH.01.001", "nama": "Ayam broiler utuh", "satuan": "kg"}, {"kode": "PH.01.002", "nama": "Fillet dada ayam", "satuan": "kg"}, {"kode": "PH.01.003", "nama": "Paha ayam atas", "satuan": "kg"}, {"kode": "PH.01.004", "nama": "Paha ayam bawah (drumstick)", "satuan": "kg"}, {"kode": "PH.01.005", "nama": "Sayap ayam", "satuan": "kg"}, {"kode": "PH.01.006", "nama": "Hati ayam", "satuan": "kg"}, {"kode": "PH.01.007", "nama": "Ampela ayam", "satuan": "kg"}, {"kode": "PH.01.008", "nama": "Telur ayam ras/negeri", "satuan": "kg"}, {"kode": "PH.01.009", "nama": "Telur ayam kampung", "satuan": "kg"}, {"kode": "PH.01.010", "nama": "Telur puyuh", "satuan": "kg"}, {"kode": "PH.01.011", "nama": "Sosis ayam", "satuan": "pak"}, {"kode": "PH.01.099", "nama": "Ayam dan olahannya-lainnya", "satuan": "kg"}, {"kode": "PH.02.001", "nama": "Daging sapi segar (has luar/sirloin)", "satuan": "kg"}, {"kode": "PH.02.002", "nama": "Daging sapi segar (has dalam/tenderloin)", "satuan": "kg"}, {"kode": "PH.02.003", "nama": "Daging sapi segar (sandung lamur/brisket)", "satuan": "kg"}, {"kode": "PH.02.004", "nama": "Daging sapi segar (paha)", "satuan": "kg"}, {"kode": "PH.02.005", "nama": "Daging sapi giling", "satuan": "kg"}, {"kode": "PH.02.006", "nama": "Hati sapi", "satuan": "kg"}, {"kode": "PH.02.007", "nama": "Iga sapi", "satuan": "kg"}, {"kode": "PH.02.008", "nama": "Daging kerbau segar", "satuan": "kg"}, {"kode": "PH.02.009", "nama": "Daging kambing segar", "satuan": "kg"}, {"kode": "PH.02.010", "nama": "Daging domba segar", "satuan": "kg"}, {"kode": "PH.02.011", "nama": "Hati kambing", "satuan": "kg"}, {"kode": "PH.02.012", "nama": "Sosis sapi", "satuan": "pak"}, {"kode": "PH.02.099", "nama": "Daging sapi/kerbau/kambing-lainnya", "satuan": "kg"}, {"kode": "PH.03.001", "nama": "Lele", "satuan": "kg"}, {"kode": "PH.03.002", "nama": "Nila", "satuan": "kg"}, {"kode": "PH.03.003", "nama": "Mujair", "satuan": "kg"}, {"kode": "PH.03.004", "nama": "Patin", "satuan": "kg"}, {"kode": "PH.03.005", "nama": "Gurame", "satuan": "kg"}, {"kode": "PH.03.006", "nama": "Mas", "satuan": "kg"}, {"kode": "PH.03.007", "nama": "Gabus", "satuan": "kg"}, {"kode": "PH.03.008", "nama": "Fillet ikan tawar", "satuan": "kg"}, {"kode": "PH.03.099", "nama": "Ikan air tawar-lainnya", "satuan": "kg"}, {"kode": "PH.04.001", "nama": "Kembung", "satuan": "kg"}, {"kode": "PH.04.002", "nama": "Tongkol", "satuan": "kg"}, {"kode": "PH.04.003", "nama": "Cakalang", "satuan": "kg"}, {"kode": "PH.04.004", "nama": "Tuna", "satuan": "kg"}, {"kode": "PH.04.005", "nama": "Sarden/lemuru", "satuan": "kg"}, {"kode": "PH.04.006", "nama": "Bandeng", "satuan": "kg"}, {"kode": "PH.04.007", "nama": "Tenggiri", "satuan": "kg"}, {"kode": "PH.04.008", "nama": "Kakap", "satuan": "kg"}, {"kode": "PH.04.009", "nama": "Fillet ikan laut", "satuan": "kg"}, {"kode": "PH.04.010", "nama": "Ikan laut-lainnya", "satuan": "kg"}, {"kode": "PH.05.001", "nama": "Udang segar", "satuan": "kg"}, {"kode": "PH.05.002", "nama": "Udang beku", "satuan": "kg"}, {"kode": "PH.05.003", "nama": "Cumi-cumi", "satuan": "kg"}, {"kode": "PH.05.004", "nama": "Sotong", "satuan": "kg"}, {"kode": "PH.05.005", "nama": "Kepiting/rajungan", "satuan": "kg"}, {"kode": "PH.05.006", "nama": "Kerang hijau", "satuan": "kg"}, {"kode": "PH.05.007", "nama": "Kerang dara", "satuan": "kg"}, {"kode": "PH.05.099", "nama": "Produk perikanan lain-lainnya", "satuan": "kg"}, {"kode": "PH.06.001", "nama": "Susu UHT full cream", "satuan": "liter"}, {"kode": "PH.06.002", "nama": "Susu UHT rendah lemak", "satuan": "liter"}, {"kode": "PH.06.003", "nama": "Susu pasteurisasi", "satuan": "liter"}, {"kode": "PH.06.004", "nama": "Susu bubuk", "satuan": "kg"}, {"kode": "PH.06.005", "nama": "Yogurt plain", "satuan": "pak"}, {"kode": "PH.06.006", "nama": "Keju cheddar", "satuan": "pak"}, {"kode": "PH.06.007", "nama": "Keju olahan (slice)", "satuan": "pak"}, {"kode": "PH.06.099", "nama": "Susu dan olahan-lainnya", "satuan": "liter"}, {"kode": "PN.01.001", "nama": "Kedelai biji kering", "satuan": "kg"}, {"kode": "PN.01.002", "nama": "Tempe", "satuan": "kg"}, {"kode": "PN.01.003", "nama": "Tahu putih", "satuan": "kg"}, {"kode": "PN.01.004", "nama": "Tahu kuning", "satuan": "kg"}, {"kode": "PN.01.005", "nama": "Tahu sutra", "satuan": "kg"}, {"kode": "PN.01.006", "nama": "Susu kedelai", "satuan": "liter"}, {"kode": "PN.01.007", "nama": "Tepung kedelai", "satuan": "kg"}, {"kode": "PN.01.099", "nama": "Kedelai dan olahannya-lainnya", "satuan": "kg"}, {"kode": "PN.02.001", "nama": "Kacang tanah kupas", "satuan": "kg"}, {"kode": "PN.02.002", "nama": "Kacang tanah dengan kulit", "satuan": "kg"}, {"kode": "PN.02.003", "nama": "Kacang hijau", "satuan": "kg"}, {"kode": "PN.02.004", "nama": "Kacang merah", "satuan": "kg"}, {"kode": "PN.02.005", "nama": "Kacang tolo/tunggak", "satuan": "kg"}, {"kode": "PN.02.006", "nama": "Kacang hitam", "satuan": "kg"}, {"kode": "PN.02.007", "nama": "Kacang arab/chickpea", "satuan": "kg"}, {"kode": "PN.02.008", "nama": "Kacang polong/pea", "satuan": "kg"}, {"kode": "PN.02.009", "nama": "Kacang mede", "satuan": "kg"}, {"kode": "PN.02.010", "nama": "Kacang almond", "satuan": "kg"}, {"kode": "PN.02.099", "nama": "Kacang kacangan-lainnya", "satuan": "kg"}, {"kode": "PN.03.001", "nama": "Wijen", "satuan": "kg"}, {"kode": "PN.03.002", "nama": "Biji bunga matahari", "satuan": "kg"}, {"kode": "PN.03.003", "nama": "Chia seed", "satuan": "kg"}, {"kode": "PN.03.004", "nama": "Flaxseed", "satuan": "kg"}, {"kode": "PN.03.099", "nama": "Biji-bijian dan produknya-lainnya", "satuan": "kg"}, {"kode": "SY.01.001", "nama": "Bayam", "satuan": "ikat"}, {"kode": "SY.01.002", "nama": "Kangkung", "satuan": "ikat"}, {"kode": "SY.01.003", "nama": "Sawi hijau", "satuan": "ikat"}, {"kode": "SY.01.004", "nama": "Sawi putih", "satuan": "ikat"}, {"kode": "SY.01.005", "nama": "Pakcoy", "satuan": "ikat"}, {"kode": "SY.01.006", "nama": "Selada", "satuan": "ikat"}, {"kode": "SY.01.007", "nama": "Daun singkong", "satuan": "ikat"}, {"kode": "SY.01.008", "nama": "Daun pepaya", "satuan": "ikat"}, {"kode": "SY.01.009", "nama": "Kelor", "satuan": "ikat"}, {"kode": "SY.01.010", "nama": "Katuk", "satuan": "ikat"}, {"kode": "SY.01.011", "nama": "Seledri daun", "satuan": "ikat"}, {"kode": "SY.01.012", "nama": "Brokoli", "satuan": "kg"}, {"kode": "SY.01.013", "nama": "Kembang kol", "satuan": "kg"}, {"kode": "SY.01.014", "nama": "Buncis", "satuan": "kg"}, {"kode": "SY.01.015", "nama": "Seledri batang", "satuan": "ikat"}, {"kode": "SY.01.016", "nama": "Asparagus", "satuan": "ikat"}, {"kode": "SY.01.099", "nama": "Sayuran daun/batang/bunga-lainnya", "satuan": "ikat"}, {"kode": "SY.02.001", "nama": "Tomat", "satuan": "kg"}, {"kode": "SY.02.002", "nama": "Mentimun", "satuan": "kg"}, {"kode": "SY.02.003", "nama": "Terong ungu", "satuan": "kg"}, {"kode": "SY.02.004", "nama": "Terong hijau", "satuan": "kg"}, {"kode": "SY.02.005", "nama": "Cabai merah besar", "satuan": "kg"}, {"kode": "SY.02.006", "nama": "Cabai rawit", "satuan": "kg"}, {"kode": "SY.02.007", "nama": "Labu siam", "satuan": "kg"}, {"kode": "SY.02.008", "nama": "Pare", "satuan": "kg"}, {"kode": "SY.02.009", "nama": "Paprika", "satuan": "kg"}, {"kode": "SY.02.010", "nama": "Okra", "satuan": "kg"}, {"kode": "SY.02.011", "nama": "Wortel", "satuan": "kg"}, {"kode": "SY.02.012", "nama": "Lobak putih", "satuan": "kg"}, {"kode": "SY.02.013", "nama": "Bit", "satuan": "kg"}, {"kode": "SY.02.099", "nama": "Sayuran buah/umbi/akar-lainnya", "satuan": "kg"}, {"kode": "SY.03.001", "nama": "Bawang merah", "satuan": "kg"}, {"kode": "SY.03.002", "nama": "Bawang putih", "satuan": "kg"}, {"kode": "SY.03.003", "nama": "Bawang bombai", "satuan": "kg"}, {"kode": "SY.03.004", "nama": "Daun bawang", "satuan": "kg"}, {"kode": "SY.03.005", "nama": "Bawang prei", "satuan": "kg"}, {"kode": "SY.03.006", "nama": "Jahe", "satuan": "kg"}, {"kode": "SY.03.007", "nama": "Kunyit", "satuan": "kg"}, {"kode": "SY.03.008", "nama": "Lengkuas", "satuan": "kg"}, {"kode": "SY.03.009", "nama": "Kencur", "satuan": "kg"}, {"kode": "SY.03.010", "nama": "Serai", "satuan": "kg"}, {"kode": "SY.03.011", "nama": "Temu kunci", "satuan": "kg"}, {"kode": "SY.03.012", "nama": "Kemiri", "satuan": "kg"}, {"kode": "SY.03.099", "nama": "Sayuran bawang dan aromatik lainnya", "satuan": "kg"}, {"kode": "SY.04.001", "nama": "Jamur tiram", "satuan": "kg"}, {"kode": "SY.04.002", "nama": "Jamur kancing", "satuan": "kg"}, {"kode": "SY.04.003", "nama": "Jamur kuping", "satuan": "kg"}, {"kode": "SY.04.004", "nama": "Jamur shiitake", "satuan": "kg"}, {"kode": "SY.04.099", "nama": "Jamur-lainnya", "satuan": "kg"}, {"kode": "BU.01.001", "nama": "Pisang ambon", "satuan": "kg"}, {"kode": "BU.01.002", "nama": "Pisang kepok", "satuan": "kg"}, {"kode": "BU.01.003", "nama": "Pisang raja", "satuan": "kg"}, {"kode": "BU.01.004", "nama": "Pepaya", "satuan": "kg"}, {"kode": "BU.01.005", "nama": "Semangka", "satuan": "kg"}, {"kode": "BU.01.006", "nama": "Melon", "satuan": "kg"}, {"kode": "BU.01.007", "nama": "Mangga harum manis", "satuan": "kg"}, {"kode": "BU.01.008", "nama": "Mangga gedong", "satuan": "kg"}, {"kode": "BU.01.009", "nama": "Jeruk manis", "satuan": "kg"}, {"kode": "BU.01.010", "nama": "Jeruk keprok", "satuan": "kg"}, {"kode": "BU.01.011", "nama": "Jambu biji", "satuan": "kg"}, {"kode": "BU.01.012", "nama": "Jambu air", "satuan": "kg"}, {"kode": "BU.01.013", "nama": "Nanas", "satuan": "kg"}, {"kode": "BU.01.014", "nama": "Salak", "satuan": "kg"}, {"kode": "BU.01.015", "nama": "Rambutan", "satuan": "kg"}, {"kode": "BU.01.016", "nama": "Duku", "satuan": "kg"}, {"kode": "BU.01.017", "nama": "Sirsak", "satuan": "kg"}, {"kode": "BU.01.018", "nama": "Durian", "satuan": "kg"}, {"kode": "BU.01.019", "nama": "Manggis", "satuan": "kg"}, {"kode": "BU.01.020", "nama": "Alpukat", "satuan": "kg"}, {"kode": "BU.01.021", "nama": "Apel malang", "satuan": "kg"}, {"kode": "BU.01.022", "nama": "Buah naga merah", "satuan": "kg"}, {"kode": "BU.01.023", "nama": "Buah naga putih", "satuan": "kg"}, {"kode": "BU.01.024", "nama": "Kedondong", "satuan": "kg"}, {"kode": "BU.01.025", "nama": "Markisa", "satuan": "kg"}, {"kode": "BU.01.026", "nama": "Belimbing", "satuan": "kg"}, {"kode": "BU.01.027", "nama": "Sawo", "satuan": "kg"}, {"kode": "BU.01.028", "nama": "Matoa", "satuan": "kg"}, {"kode": "BU.01.099", "nama": "Buah lokal-lainnya", "satuan": "kg"}, {"kode": "BU.02.001", "nama": "Apel", "satuan": "kg"}, {"kode": "BU.02.002", "nama": "Pear", "satuan": "kg"}, {"kode": "BU.02.003", "nama": "Anggur merah", "satuan": "kg"}, {"kode": "BU.02.004", "nama": "Anggur hijau", "satuan": "kg"}, {"kode": "BU.02.005", "nama": "Kiwi", "satuan": "kg"}, {"kode": "BU.02.099", "nama": "Buah impor-lainnya", "satuan": "kg"}, {"kode": "BB.01.001", "nama": "Minyak goreng sawit", "satuan": "liter"}, {"kode": "BB.01.002", "nama": "Minyak goreng campuran", "satuan": "liter"}, {"kode": "BB.01.003", "nama": "Minyak kelapa", "satuan": "liter"}, {"kode": "BB.01.004", "nama": "Margarin", "satuan": "kg"}, {"kode": "BB.01.005", "nama": "Mentega (butter)", "satuan": "kg"}, {"kode": "BB.01.099", "nama": "Minyak dan lemak-lainnya", "satuan": "kg"}, {"kode": "BB.02.001", "nama": "Garam beryodium", "satuan": "pak"}, {"kode": "BB.02.002", "nama": "Gula pasir", "satuan": "kg"}, {"kode": "BB.02.003", "nama": "Gula merah/aren", "satuan": "kg"}, {"kode": "BB.02.004", "nama": "Madu", "satuan": "kg"}, {"kode": "BB.02.099", "nama": "Garam, gula, dan pemanis-lainnya", "satuan": "kg"}, {"kode": "BB.03.001", "nama": "Lada/merica bubuk", "satuan": "pcs"}, {"kode": "BB.03.002", "nama": "Ketumbar bubuk", "satuan": "pcs"}, {"kode": "BB.03.003", "nama": "Jinten bubuk", "satuan": "pcs"}, {"kode": "BB.03.004", "nama": "Pala bubuk", "satuan": "pcs"}, {"kode": "BB.03.005", "nama": "Kayu manis", "satuan": "pcs"}, {"kode": "BB.03.006", "nama": "Cengkeh", "satuan": "pcs"}, {"kode": "BB.03.007", "nama": "Kapulaga", "satuan": "pcs"}, {"kode": "BB.03.008", "nama": "Daun salam kering", "satuan": "pcs"}, {"kode": "BB.03.009", "nama": "Oregano", "satuan": "pcs"}, {"kode": "BB.03.099", "nama": "Bumbu kering (rempah)-lainnya", "satuan": "pcs"}, {"kode": "BB.04.001", "nama": "Kecap manis", "satuan": "botol"}, {"kode": "BB.04.002", "nama": "Kecap asin", "satuan": "botol"}, {"kode": "BB.04.003", "nama": "Saus sambal", "satuan": "botol"}, {"kode": "BB.04.004", "nama": "Saus tomat", "satuan": "botol"}, {"kode": "BB.04.005", "nama": "Saus tiram", "satuan": "botol"}, {"kode": "BB.04.006", "nama": "Cuka makan", "satuan": "botol"}, {"kode": "BB.04.007", "nama": "Mayones", "satuan": "botol"}, {"kode": "BB.04.099", "nama": "Bumbu cair, saus, dan kondimen-lainnya", "satuan": "botol"}, {"kode": "BB.05.001", "nama": "Santan segar", "satuan": "pcs"}, {"kode": "BB.05.002", "nama": "Santan instan cair", "satuan": "pcs"}, {"kode": "BB.05.003", "nama": "Santan bubuk", "satuan": "pcs"}, {"kode": "BB.05.004", "nama": "Kaldu bubuk ayam", "satuan": "pcs"}, {"kode": "BB.05.005", "nama": "Kaldu bubuk sapi", "satuan": "pcs"}, {"kode": "BB.05.006", "nama": "Kaldu jamur", "satuan": "pcs"}, {"kode": "BB.05.007", "nama": "Agar-agar bubuk", "satuan": "pcs"}, {"kode": "BB.05.008", "nama": "Gelatin", "satuan": "pcs"}, {"kode": "BB.05.099", "nama": "Produk olahan dasar-lainnya", "satuan": "pcs"}, {"kode": "BB.06.001", "nama": "Terasi", "satuan": "pcs"}, {"kode": "BB.06.002", "nama": "Tauco", "satuan": "pcs"}, {"kode": "BB.06.003", "nama": "Ragi roti", "satuan": "pcs"}, {"kode": "BB.06.004", "nama": "Baking powder", "satuan": "pcs"}, {"kode": "BB.06.099", "nama": "Bahan fermentasi/pelengkap-lainnya", "satuan": "pcs"}, {"kode": "BB.07.001", "nama": "Air minum kemasan galon", "satuan": "pcs"}, {"kode": "BB.07.002", "nama": "Air minum kemasan botol 2 liter", "satuan": "dus"}, {"kode": "BB.07.003", "nama": "Air minum kemasan botol 1,5 liter", "satuan": "dus"}, {"kode": "BB.07.004", "nama": "Air minum kemasan botol 600 ml", "satuan": "dus"}, {"kode": "BB.07.005", "nama": "Air minum kemasan botol 330 ml", "satuan": "dus"}, {"kode": "BB.07.006", "nama": "Air minum kemasan cup", "satuan": "dus"}, {"kode": "BB.07.007", "nama": "Minuman kemasan botol/kaleng", "satuan": "pcs"}, {"kode": "BB.07.008", "nama": "Susu kental manis", "satuan": "pcs"}, {"kode": "BB.07.099", "nama": "Bahan minuman pendamping-lainnya", "satuan": "pcs"}];
 const SALDO_AWAL = {"KH.01.001": {"saldo": 12, "harga": 15000}, "KH.02.004": {"saldo": 8, "harga": 17000}, "KH.03.008": {"saldo": 5, "harga": 7000}, "KH.04.001": {"saldo": 7, "harga": 14000}, "KH.04.009": {"saldo": 15, "harga": 15000}, "KH.04.011": {"saldo": 5, "harga": 7500}, "KH.04.012": {"saldo": 4, "harga": 12500}, "PH.01.001": {"saldo": 5, "harga": 30000}, "PH.01.008": {"saldo": 10, "harga": 32000}, "PH.01.010": {"saldo": 5, "harga": 22000}, "PH.01.011": {"saldo": 6, "harga": 25000}, "PH.02.001": {"saldo": 10, "harga": 100000}, "PH.02.012": {"saldo": 7, "harga": 40000}, "PH.04.002": {"saldo": 4, "harga": 35000}, "PH.04.005": {"saldo": 5, "harga": 60000}, "PH.05.001": {"saldo": 5, "harga": 70000}, "PH.05.003": {"saldo": 9, "harga": 30000}, "PH.06.004": {"saldo": 5, "harga": 50000}, "PH.06.007": {"saldo": 18, "harga": 30000}, "PN.01.002": {"saldo": 3, "harga": 15000}, "PN.01.003": {"saldo": 2, "harga": 20000}, "PN.02.003": {"saldo": 17, "harga": 20000}, "PN.02.004": {"saldo": 9, "harga": 20000}, "BB.01.001": {"saldo": 9, "harga": 16000}};
 
-const KELOMPOK = {
-  KH: { nama: "Karbohidrat", color: "#C48A00", bg: "#FBF1DA" },
-  PH: { nama: "Protein Hewani", color: "#A8402A", bg: "#F8E6E1" },
-  PN: { nama: "Protein Nabati", color: "#6E7A3B", bg: "#EEF0DD" },
-  SY: { nama: "Sayuran", color: "#2B6E52", bg: "#DEEEE6" },
-  BU: { nama: "Buah-buahan", color: "#C1602E", bg: "#F8E4D6" },
-  BB: { nama: "Bahan Baku Lain", color: "#5B6472", bg: "#E7E9EC" },
-};
+const DEFAULT_KELOMPOK = [
+  { kode: "KH", nama: "Karbohidrat", color: "#C48A00", bg: "#FBF1DA" },
+  { kode: "PH", nama: "Protein Hewani", color: "#A8402A", bg: "#F8E6E1" },
+  { kode: "PN", nama: "Protein Nabati", color: "#6E7A3B", bg: "#EEF0DD" },
+  { kode: "SY", nama: "Sayuran", color: "#2B6E52", bg: "#DEEEE6" },
+  { kode: "BU", nama: "Buah-buahan", color: "#C1602E", bg: "#F8E4D6" },
+  { kode: "BB", nama: "Bahan Baku Lain", color: "#5B6472", bg: "#E7E9EC" },
+];
 
-function kelompokOf(kode) { return kode.split(".")[0]; }
+// Palet warna otomatis untuk kelompok baru yang dibuat lewat UI Master Barang.
+const KELOMPOK_PALETTE = [
+  { color: "#2B5F8A", bg: "#DEEAF4" },
+  { color: "#7A4FA3", bg: "#EEE3F5" },
+  { color: "#1A7A7A", bg: "#DBF0EF" },
+  { color: "#9A6B1E", bg: "#F5EAD6" },
+  { color: "#B0447A", bg: "#F7E1EC" },
+  { color: "#4A6B2F", bg: "#E4EDD9" },
+];
+function autoKelompokColor(existingCount) {
+  return KELOMPOK_PALETTE[existingCount % KELOMPOK_PALETTE.length];
+}
+
+function kelompokOf(kode) { return (kode || "").split(".")[0]; }
 
 function fmtRp(n) {
   n = Number(n) || 0;
@@ -79,8 +92,10 @@ export default function App() {
   const [saldoByPeriode, setSaldoByPeriode] = useState({});
   const [periodeState, setPeriodeState] = useState({ list: [], activeId: null });
   const [masterItems, setMasterItems] = useState([]);
+  const [kelompokList, setKelompokList] = useState([]);
   const [suppliers, setSuppliers] = useState([]);
   const [log, setLog] = useState([]);
+  const [liveTick, setLiveTick] = useState(0);
   const [session, setSession] = useState(null);
   const [page, setPage] = useState("dashboard");
   const [navOpen, setNavOpen] = useState(false);
@@ -97,6 +112,15 @@ export default function App() {
       const { error: seedErr } = await supabase.from("master_barang").insert(ITEMS);
       if (seedErr) throw seedErr;
       masterRows = ITEMS;
+    }
+
+    // 1b) Kelompok (kategori barang): seed dari DEFAULT_KELOMPOK hanya jika tabel kosong.
+    let { data: kelompokRows, error: kelompokErr } = await supabase.from("kelompok").select("*").order("kode");
+    if (kelompokErr) throw kelompokErr;
+    if (!kelompokRows || kelompokRows.length === 0) {
+      const { error: seedKelErr } = await supabase.from("kelompok").insert(DEFAULT_KELOMPOK);
+      if (seedKelErr) throw seedKelErr;
+      kelompokRows = DEFAULT_KELOMPOK;
     }
 
     // 2) Periode: seed periode pertama + saldo awal dari SALDO_AWAL hanya jika tabel kosong.
@@ -135,6 +159,7 @@ export default function App() {
     }
 
     setMasterItems(masterRows);
+    setKelompokList(kelompokRows);
     setSuppliers(supplierRes.data || []);
     setSaldoByPeriode(saldoObj);
     setMasuk((masukRes.data || []).map(mapMasukRow));
@@ -182,6 +207,7 @@ export default function App() {
     setKeluar(data.keluar || []);
     setSaldoByPeriode(data.saldo || {});
     setMasterItems(data.master || []);
+    setKelompokList(data.kelompok && data.kelompok.length ? data.kelompok : DEFAULT_KELOMPOK);
     setSuppliers(data.supplier || []);
     const pr = data.periode || { list: [], activeId: null };
     setPeriodeState(pr);
@@ -236,6 +262,14 @@ export default function App() {
         if (error) throw error;
         setMasterItems((prev) => [...prev, { kode, nama, satuan }]);
       }
+    },
+    simpanKelompok: async ({ kode, nama }) => {
+      const kodeBersih = kode.trim().toUpperCase();
+      const { color, bg } = autoKelompokColor(kelompokList.length);
+      const { data, error } = await supabase.from("kelompok").insert({ kode: kodeBersih, nama: nama.trim(), color, bg }).select().single();
+      if (error) throw error;
+      setKelompokList((prev) => [...prev, data]);
+      return data;
     },
     hapusMaster: async (kode) => {
       const { error } = await supabase.from("master_barang").delete().eq("kode", kode);
@@ -307,6 +341,32 @@ export default function App() {
 
   const stock = useMemo(() => computeStockFor(viewingPeriodeId), [computeStockFor, viewingPeriodeId]);
 
+  const kelompokMap = useMemo(() => {
+    const m = {};
+    for (const k of kelompokList) m[k.kode] = k;
+    return m;
+  }, [kelompokList]);
+
+  // Realtime: dengarkan perubahan tabel transaksi/master/saldo di Supabase supaya menu
+  // "Cek Stok" (dan seluruh halaman lain) langsung ter-update tanpa perlu reload manual,
+  // termasuk kalau ada admin lain yang mencatat transaksi di perangkat berbeda.
+  useEffect(() => {
+    if (!session || session.role === "viewer") return;
+    let timer = null;
+    const scheduleReload = () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => { loadStaffData().catch(() => {}); }, 500);
+    };
+    const channel = supabase
+      .channel("realtime-gudang")
+      .on("postgres_changes", { event: "*", schema: "public", table: "transaksi_masuk" }, scheduleReload)
+      .on("postgres_changes", { event: "*", schema: "public", table: "transaksi_keluar" }, scheduleReload)
+      .on("postgres_changes", { event: "*", schema: "public", table: "saldo_awal" }, scheduleReload)
+      .on("postgres_changes", { event: "*", schema: "public", table: "master_barang" }, scheduleReload)
+      .subscribe();
+    return () => { clearTimeout(timer); supabase.removeChannel(channel); };
+  }, [session, loadStaffData]);
+
   // Tutup periode aktif & buka periode baru lewat RPC atomik di database (lihat tutup_periode()
   // di schema.sql), lalu muat ulang semua data supaya state lokal konsisten dengan server.
   const tutupPeriode = useCallback(async ({ nama, mulai, selesai }) => {
@@ -360,7 +420,7 @@ export default function App() {
     editPeriode,
   };
 
-  const ctx = { session, stock, masuk, keluar, masterItems, saldoByPeriode, log, persist, addLog, periode, computeStockFor, suppliers, ensureSupplier };
+  const ctx = { session, stock, masuk, keluar, masterItems, saldoByPeriode, log, persist, addLog, periode, computeStockFor, suppliers, ensureSupplier, kelompokList, kelompokMap };
 
   return (
     <div style={{ minHeight: "100vh", background: "#F1EEE4", fontFamily: "Inter, system-ui, sans-serif", color: "#20241F" }}>
@@ -370,10 +430,11 @@ export default function App() {
       {navOpen && <div className="nav-overlay show" onClick={() => setNavOpen(false)} />}
       <div style={{ display: "flex", maxWidth: 1280, margin: "0 auto" }}>
         <SideNav role={session.role} page={page} setPage={setPage} navOpen={navOpen} setNavOpen={setNavOpen} />
-        <main style={{ flex: 1, padding: "20px 16px 60px", minWidth: 0 }}>
+        <main className="main-content" style={{ flex: 1, padding: "20px 16px 60px", minWidth: 0 }}>
           <PageRouter page={page} ctx={ctx} />
         </main>
       </div>
+      <BottomTabBar role={session.role} page={page} setPage={setPage} setNavOpen={setNavOpen} />
     </div>
   );
 }
@@ -410,8 +471,14 @@ function GlobalStyle() {
   return (
     <style>{`
       @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap');
-      * { box-sizing: border-box; }
-      body { margin: 0; }
+      * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+      html, body { margin: 0; overscroll-behavior-y: contain; }
+      body { padding-bottom: env(safe-area-inset-bottom); }
+      @keyframes pulseLive { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+      button { touch-action: manipulation; }
+      button:active { transform: scale(0.97); }
+      .bottom-tab-bar { display: none; }
+      .bottom-tab-btn:active { transform: scale(0.92); }
       .sg { font-family: 'Space Grotesk', sans-serif; }
       .mono { font-family: 'IBM Plex Mono', monospace; }
       input, select, button, textarea { font-family: 'Inter', sans-serif; }
@@ -435,6 +502,8 @@ function GlobalStyle() {
         .side-nav.open { transform: translateX(0); }
         .menu-btn { display: flex; }
         .nav-overlay.show { display: block; position: fixed; inset: 0; background: rgba(20,25,20,.4); z-index: 35; }
+        .bottom-tab-bar { display: flex; }
+        .main-content { padding-bottom: calc(72px + env(safe-area-inset-bottom)) !important; }
       }
       @media (max-width: 640px) {
         .topbar-username { display: none; }
@@ -586,6 +655,7 @@ function RoleBadge({ role }) {
 
 const NAV_ITEMS = [
   { key: "dashboard", label: "Dashboard", icon: LayoutDashboard, roles: ["superadmin", "admin", "viewer"] },
+  { key: "cekstok", label: "Cek Stok", icon: Eye, roles: ["superadmin", "admin", "viewer"] },
   { key: "masuk", label: "Penerimaan Barang", icon: ArrowDownToLine, roles: ["superadmin", "admin"] },
   { key: "keluar", label: "Pengeluaran Barang", icon: ArrowUpFromLine, roles: ["superadmin", "admin"] },
   { key: "laporan", label: "Laporan Stock", icon: ClipboardList, roles: ["superadmin", "admin", "viewer"] },
@@ -614,6 +684,38 @@ function SideNav({ role, page, setPage, navOpen, setNavOpen }) {
   );
 }
 
+// Tab bar bawah bergaya aplikasi native (iOS/Android), muncul hanya di layar mobile (lihat CSS
+// .bottom-tab-bar). Menampilkan 4 menu paling sering dipakai + tombol "Lainnya" yang membuka
+// drawer menu lengkap (SideNav), supaya semua item menu tetap bisa diakses di mobile.
+const BOTTOM_TAB_KEYS = ["dashboard", "cekstok", "masuk", "keluar"];
+function BottomTabBar({ role, page, setPage, setNavOpen }) {
+  const items = NAV_ITEMS.filter((i) => BOTTOM_TAB_KEYS.includes(i.key) && i.roles.includes(role));
+  return (
+    <nav className="bottom-tab-bar" style={{
+      position: "fixed", left: 0, right: 0, bottom: 0, zIndex: 32, background: "#FBF9F3",
+      borderTop: "1px solid #E4DFCF", padding: "6px 4px calc(6px + env(safe-area-inset-bottom))",
+      alignItems: "center", justifyContent: "space-around", boxShadow: "0 -4px 16px rgba(0,0,0,.06)",
+    }}>
+      {items.map((it) => {
+        const Icon = it.icon;
+        const active = page === it.key;
+        return (
+          <button key={it.key} className="bottom-tab-btn" onClick={() => setPage(it.key)}
+            style={{ background: "none", border: "none", display: "flex", flexDirection: "column", alignItems: "center", gap: 2, padding: "6px 10px", cursor: "pointer", color: active ? "#2F5D50" : "#8B8371", flex: 1 }}>
+            <Icon size={19} strokeWidth={active ? 2.4 : 2} />
+            <span style={{ fontSize: 10, fontWeight: active ? 700 : 500 }}>{it.label.split(" ")[0]}</span>
+          </button>
+        );
+      })}
+      <button className="bottom-tab-btn" onClick={() => setNavOpen(true)}
+        style={{ background: "none", border: "none", display: "flex", flexDirection: "column", alignItems: "center", gap: 2, padding: "6px 10px", cursor: "pointer", color: "#8B8371", flex: 1 }}>
+        <Menu size={19} />
+        <span style={{ fontSize: 10, fontWeight: 500 }}>Lainnya</span>
+      </button>
+    </nav>
+  );
+}
+
 function PageRouter({ page, ctx }) {
   const { session } = ctx;
   const found = NAV_ITEMS.find((n) => n.key === page);
@@ -621,6 +723,7 @@ function PageRouter({ page, ctx }) {
   if (!allowed) return <Dashboard ctx={ctx} />;
   switch (page) {
     case "dashboard": return <Dashboard ctx={ctx} />;
+    case "cekstok": return <StokRealtime ctx={ctx} />;
     case "masuk": return <Penerimaan ctx={ctx} />;
     case "keluar": return <Pengeluaran ctx={ctx} />;
     case "laporan": return <LaporanStock ctx={ctx} />;
@@ -648,15 +751,15 @@ function PageHeader({ title, subtitle, right }) {
 function Card({ children, style }) {
   return <div style={{ background: "#FBF9F3", border: "1px solid #E4DFCF", borderRadius: 12, padding: 18, ...style }}>{children}</div>;
 }
-function KelompokChip({ kode }) {
-  const k = KELOMPOK[kelompokOf(kode)];
-  if (!k) return null;
+function KelompokChip({ kode, kelompokMap }) {
+  const k = kelompokMap ? kelompokMap[kelompokOf(kode)] : null;
+  if (!k) return <span className="mono" style={{ fontSize: 10.5, fontWeight: 600, color: "#5B6472", background: "#E7E9EC", padding: "2px 7px", borderRadius: 5 }}>{kelompokOf(kode)}</span>;
   return <span className="mono" style={{ fontSize: 10.5, fontWeight: 600, color: k.color, background: k.bg, padding: "2px 7px", borderRadius: 5 }}>{kelompokOf(kode)}</span>;
 }
 
 /* ============================== DASHBOARD ============================== */
 function Dashboard({ ctx }) {
-  const { stock, masuk, keluar, session } = ctx;
+  const { stock, masuk, keluar, session, kelompokMap } = ctx;
   const totalNilai = stock.reduce((s, i) => s + i.nilai, 0);
   const lowStock = stock.filter((i) => i.saldoAkhir > 0 && i.saldoAkhir <= 3);
   const habis = stock.filter((i) => i.saldoAkhir <= 0);
@@ -686,7 +789,7 @@ function Dashboard({ ctx }) {
         <Card>
           <div className="sg" style={{ fontWeight: 700, marginBottom: 12, fontSize: 14.5 }}>Nilai Persediaan per Kelompok</div>
           {Object.entries(byKelompok).sort((a, b) => b[1] - a[1]).map(([k, v]) => {
-            const info = KELOMPOK[k];
+            const info = kelompokMap[k];
             const max = Math.max(...Object.values(byKelompok), 1);
             return (
               <div key={k} style={{ marginBottom: 10 }}>
@@ -760,7 +863,7 @@ function Empty({ text }) {
 }
 
 /* ============================== ITEM PICKER ============================== */
-function ItemPicker({ items, value, onChange }) {
+function ItemPicker({ items, value, onChange, kelompokMap }) {
   const [q, setQ] = useState("");
   const [open, setOpen] = useState(false);
   const filtered = useMemo(() => {
@@ -789,7 +892,7 @@ function ItemPicker({ items, value, onChange }) {
               style={{ padding: "8px 12px", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid #F1EEE4", fontSize: 13 }}
               onMouseDown={(e) => e.preventDefault()}>
               <span>{it.nama} <span style={{ color: "#A39B87", fontSize: 11 }}>({it.satuan})</span></span>
-              <KelompokChip kode={it.kode} />
+              <KelompokChip kode={it.kode} kelompokMap={kelompokMap} />
             </div>
           ))}
         </div>
@@ -843,9 +946,73 @@ function SupplierPicker({ suppliers, value, onChange }) {
   );
 }
 
+/* ============================== FILTER RIWAYAT (tanggal + petugas) ============================== */
+function RiwayatFilterBar({ rows, onFiltered }) {
+  const [mode, setMode] = useState("semua"); // semua | hari | periode
+  const [tanggal, setTanggal] = useState(todayInput());
+  const [dari, setDari] = useState(todayInput());
+  const [sampai, setSampai] = useState(todayInput());
+  const [oleh, setOleh] = useState("ALL");
+
+  const petugasList = useMemo(() => {
+    const s = new Set(rows.map((r) => r.oleh).filter(Boolean));
+    return Array.from(s).sort();
+  }, [rows]);
+
+  useEffect(() => {
+    let out = rows;
+    if (mode === "hari") {
+      out = out.filter((r) => r.tanggal === tanggal);
+    } else if (mode === "periode") {
+      out = out.filter((r) => r.tanggal >= dari && r.tanggal <= sampai);
+    }
+    if (oleh !== "ALL") out = out.filter((r) => r.oleh === oleh);
+    onFiltered(out);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rows, mode, tanggal, dari, sampai, oleh]);
+
+  return (
+    <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "flex-end", marginBottom: 12, padding: "10px 10px", background: "#F3F0E4", borderRadius: 8 }}>
+      <div style={{ minWidth: 130 }}>
+        <label style={{ display: "block", fontSize: 10.5, fontWeight: 600, color: "#5C5646", marginBottom: 4 }}>Filter Tanggal</label>
+        <select value={mode} onChange={(e) => setMode(e.target.value)} style={{ ...inputStyle, padding: "7px 8px", fontSize: 12.5 }}>
+          <option value="semua">Semua Tanggal</option>
+          <option value="hari">Per Hari</option>
+          <option value="periode">Periode (Rentang)</option>
+        </select>
+      </div>
+      {mode === "hari" && (
+        <div>
+          <label style={{ display: "block", fontSize: 10.5, fontWeight: 600, color: "#5C5646", marginBottom: 4 }}>Tanggal</label>
+          <input type="date" value={tanggal} onChange={(e) => setTanggal(e.target.value)} style={{ ...inputStyle, padding: "7px 8px", fontSize: 12.5 }} />
+        </div>
+      )}
+      {mode === "periode" && (
+        <>
+          <div>
+            <label style={{ display: "block", fontSize: 10.5, fontWeight: 600, color: "#5C5646", marginBottom: 4 }}>Dari</label>
+            <input type="date" value={dari} onChange={(e) => setDari(e.target.value)} style={{ ...inputStyle, padding: "7px 8px", fontSize: 12.5 }} />
+          </div>
+          <div>
+            <label style={{ display: "block", fontSize: 10.5, fontWeight: 600, color: "#5C5646", marginBottom: 4 }}>Sampai</label>
+            <input type="date" value={sampai} onChange={(e) => setSampai(e.target.value)} style={{ ...inputStyle, padding: "7px 8px", fontSize: 12.5 }} />
+          </div>
+        </>
+      )}
+      <div style={{ minWidth: 150 }}>
+        <label style={{ display: "block", fontSize: 10.5, fontWeight: 600, color: "#5C5646", marginBottom: 4 }}>Petugas</label>
+        <select value={oleh} onChange={(e) => setOleh(e.target.value)} style={{ ...inputStyle, padding: "7px 8px", fontSize: 12.5 }}>
+          <option value="ALL">Semua Petugas</option>
+          {petugasList.map((o) => <option key={o} value={o}>{o}</option>)}
+        </select>
+      </div>
+    </div>
+  );
+}
+
 /* ============================== PENERIMAAN BARANG ============================== */
 function Penerimaan({ ctx }) {
-  const { masterItems, masuk, persist, session, addLog, periode, suppliers, ensureSupplier } = ctx;
+  const { masterItems, masuk, persist, session, addLog, periode, suppliers, ensureSupplier, kelompokMap } = ctx;
   const isArsip = periode.viewingId !== periode.activeId;
   const [form, setForm] = useState({ tanggal: todayInput(), supplier: "", kode: "", vol: "", harga: "" });
   const [msg, setMsg] = useState("");
@@ -869,7 +1036,8 @@ function Penerimaan({ ctx }) {
     }
   }
 
-  const mine = masuk.filter((t) => t.periodeId === periode.viewingId).sort((a, b) => new Date(b.waktu) - new Date(a.waktu));
+  const mineAll = masuk.filter((t) => t.periodeId === periode.viewingId).sort((a, b) => new Date(b.waktu) - new Date(a.waktu));
+  const [mine, setMine] = useState(mineAll);
 
   return (
     <div>
@@ -881,7 +1049,7 @@ function Penerimaan({ ctx }) {
             <form onSubmit={submit}>
               <Field label="Tanggal"><input type="date" value={form.tanggal} onChange={(e) => setForm({ ...form, tanggal: e.target.value })} style={inputStyle} /></Field>
               <Field label="Nama Supplier"><SupplierPicker suppliers={suppliers} value={form.supplier} onChange={(v) => setForm({ ...form, supplier: v })} /></Field>
-              <Field label="Barang"><ItemPicker items={masterItems} value={form.kode} onChange={(v) => setForm({ ...form, kode: v })} /></Field>
+              <Field label="Barang"><ItemPicker items={masterItems} value={form.kode} onChange={(v) => setForm({ ...form, kode: v })} kelompokMap={kelompokMap} /></Field>
               <div style={{ display: "flex", gap: 10 }}>
                 <div style={{ flex: 1 }}><Field label="Volume"><input type="number" min="0" value={form.vol} onChange={(e) => setForm({ ...form, vol: e.target.value })} style={inputStyle} /></Field></div>
                 <div style={{ flex: 1 }}><Field label="Harga Beli / satuan"><input type="number" min="0" value={form.harga} onChange={(e) => setForm({ ...form, harga: e.target.value })} style={inputStyle} /></Field></div>
@@ -893,6 +1061,7 @@ function Penerimaan({ ctx }) {
         )}
         <Card style={{ maxHeight: 520, overflowY: "auto" }}>
           <div className="sg" style={{ fontWeight: 700, marginBottom: 10 }}>Riwayat Penerimaan</div>
+          <RiwayatFilterBar rows={mineAll} onFiltered={setMine} />
           <div className="table-wrap">
             <table>
               <thead><tr>{["Tanggal", "Barang", "Supplier", "Vol", "Harga", "Jumlah", "Oleh"].map((h) => <Th key={h}>{h}</Th>)}</tr></thead>
@@ -927,7 +1096,7 @@ function ArsipNotice() {
 
 /* ============================== PENGELUARAN BARANG ============================== */
 function Pengeluaran({ ctx }) {
-  const { masterItems, keluar, persist, session, addLog, stock, periode } = ctx;
+  const { masterItems, keluar, persist, session, addLog, stock, periode, kelompokMap } = ctx;
   const isArsip = periode.viewingId !== periode.activeId;
   const [form, setForm] = useState({ tanggal: todayInput(), kode: "", vol: "" });
   const [msg, setMsg] = useState("");
@@ -951,7 +1120,8 @@ function Pengeluaran({ ctx }) {
     }
   }
 
-  const mine = keluar.filter((t) => t.periodeId === periode.viewingId).sort((a, b) => new Date(b.waktu) - new Date(a.waktu));
+  const mineAll = keluar.filter((t) => t.periodeId === periode.viewingId).sort((a, b) => new Date(b.waktu) - new Date(a.waktu));
+  const [mine, setMine] = useState(mineAll);
 
   return (
     <div>
@@ -962,7 +1132,7 @@ function Pengeluaran({ ctx }) {
           <Card>
             <form onSubmit={submit}>
               <Field label="Tanggal"><input type="date" value={form.tanggal} onChange={(e) => setForm({ ...form, tanggal: e.target.value })} style={inputStyle} /></Field>
-              <Field label="Barang"><ItemPicker items={masterItems} value={form.kode} onChange={(v) => setForm({ ...form, kode: v })} /></Field>
+              <Field label="Barang"><ItemPicker items={masterItems} value={form.kode} onChange={(v) => setForm({ ...form, kode: v })} kelompokMap={kelompokMap} /></Field>
               <Field label="Volume"><input type="number" min="0" value={form.vol} onChange={(e) => setForm({ ...form, vol: e.target.value })} style={inputStyle} /></Field>
               {msg && <div style={{ fontSize: 12.5, color: msg.includes("cukup") ? "#A8402A" : "#2F5D50", marginBottom: 10 }}>{msg}</div>}
               <button type="submit" style={primaryBtn}><Plus size={16} /> Simpan Pengeluaran</button>
@@ -971,6 +1141,7 @@ function Pengeluaran({ ctx }) {
         )}
         <Card style={{ maxHeight: 520, overflowY: "auto" }}>
           <div className="sg" style={{ fontWeight: 700, marginBottom: 10 }}>Riwayat Pengeluaran</div>
+          <RiwayatFilterBar rows={mineAll} onFiltered={setMine} />
           <div className="table-wrap">
             <table>
               <thead><tr>{["Tanggal", "Barang", "Vol", "Petugas"].map((h) => <Th key={h}>{h}</Th>)}</tr></thead>
@@ -993,9 +1164,83 @@ function Pengeluaran({ ctx }) {
   );
 }
 
+/* ============================== CEK STOK (REALTIME) ============================== */
+function StokRealtime({ ctx }) {
+  const { stock, periode, kelompokMap, kelompokList } = ctx;
+  const [q, setQ] = useState("");
+  const [kel, setKel] = useState("ALL");
+  const [now, setNow] = useState(new Date());
+  const periodeInfo = periode.list.find((p) => p.id === periode.viewingId);
+  const isActive = periode.viewingId === periode.activeId;
+
+  // Jam pembaruan terakhir bergerak tiap kali data stock berubah (realtime dari Supabase)
+  // supaya jelas kapan data ini terakhir disegarkan.
+  useEffect(() => { setNow(new Date()); }, [stock]);
+
+  const rows = stock.filter((it) => {
+    if (kel !== "ALL" && kelompokOf(it.kode) !== kel) return false;
+    if (q && !(it.nama.toLowerCase().includes(q.toLowerCase()) || it.kode.toLowerCase().includes(q.toLowerCase()))) return false;
+    return true;
+  }).sort((a, b) => a.kode.localeCompare(b.kode));
+
+  function statusOf(it) {
+    if (it.saldoAkhir <= 0) return { label: "Habis", color: "#A8402A", bg: "#F8E4E0" };
+    if (it.saldoAkhir <= 3) return { label: "Menipis", color: "#C1602E", bg: "#F8E4D6" };
+    return { label: "Aman", color: "#2F5D50", bg: "#DEEEE6" };
+  }
+
+  return (
+    <div>
+      <PageHeader
+        title="Cek Stok"
+        subtitle={`Stok barang saat ini secara realtime - ${periodeInfo ? periodeInfo.nama : ""}.`}
+        right={
+          <span style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11.5, color: "#5C5646", background: "#EDE8DA", padding: "6px 10px", borderRadius: 20 }}>
+            <span style={{ width: 7, height: 7, borderRadius: "50%", background: isActive ? "#3FA873" : "#8B8371", display: "inline-block", animation: isActive ? "pulseLive 1.6s infinite" : "none" }} />
+            {isActive ? "Live" : "Arsip"} · update {now.toLocaleTimeString("id-ID")}
+          </span>
+        }
+      />
+      <Card>
+        <div style={{ display: "flex", gap: 10, marginBottom: 12, flexWrap: "wrap" }}>
+          <div style={{ position: "relative", flex: 1, minWidth: 200 }}>
+            <Search size={14} style={{ position: "absolute", left: 10, top: 11, color: "#A39B87" }} />
+            <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Cari barang..." style={{ ...inputStyle, paddingLeft: 30 }} />
+          </div>
+          <select value={kel} onChange={(e) => setKel(e.target.value)} style={{ ...inputStyle, width: 190 }}>
+            <option value="ALL">Semua Kelompok</option>
+            {kelompokList.map((v) => <option key={v.kode} value={v.kode}>{v.nama}</option>)}
+          </select>
+        </div>
+        <div className="table-wrap">
+          <table>
+            <thead><tr>{["Kode", "Kelompok", "Nama Barang", "Satuan", "Stok Saat Ini", "Status"].map((h) => <Th key={h}>{h}</Th>)}</tr></thead>
+            <tbody>
+              {rows.map((it) => {
+                const st = statusOf(it);
+                return (
+                  <tr key={it.kode}>
+                    <Td className="mono">{it.kode}</Td>
+                    <Td><KelompokChip kode={it.kode} kelompokMap={kelompokMap} /></Td>
+                    <Td>{it.nama}</Td>
+                    <Td>{it.satuan}</Td>
+                    <Td className="mono" style={{ fontWeight: 700 }}>{it.saldoAkhir}</Td>
+                    <Td><span style={{ fontSize: 11, fontWeight: 700, color: st.color, background: st.bg, padding: "2px 8px", borderRadius: 20 }}>{st.label}</span></Td>
+                  </tr>
+                );
+              })}
+              {rows.length === 0 && <tr><td colSpan={6}><Empty text="Tidak ada barang yang cocok." /></td></tr>}
+            </tbody>
+          </table>
+        </div>
+      </Card>
+    </div>
+  );
+}
+
 /* ============================== LAPORAN STOCK ============================== */
 function LaporanStock({ ctx }) {
-  const { stock, periode } = ctx;
+  const { stock, periode, kelompokMap, kelompokList } = ctx;
   const [q, setQ] = useState("");
   const [kel, setKel] = useState("ALL");
   const periodeInfo = periode.list.find((p) => p.id === periode.viewingId);
@@ -1019,7 +1264,7 @@ function LaporanStock({ ctx }) {
   function exportExcel() {
     const wsRekap = XLSX.utils.json_to_sheet(
       Object.entries(rekap).map(([k, v]) => ({
-        Kelompok: KELOMPOK[k] ? KELOMPOK[k].nama : k,
+        Kelompok: kelompokMap[k] ? kelompokMap[k].nama : k,
         "Saldo Awal": v.saldoAwal, Masuk: v.masuk, Keluar: v.keluar, "Saldo Akhir": v.saldoAkhir, "Nilai (Rp)": v.nilai,
       }))
     );
@@ -1056,7 +1301,7 @@ function LaporanStock({ ctx }) {
             <tbody>
               {Object.entries(rekap).map(([k, v]) => (
                 <tr key={k}>
-                  <Td><KelompokChip kode={k + ".x"} /> {KELOMPOK[k] ? KELOMPOK[k].nama : k}</Td>
+                  <Td><KelompokChip kode={k + ".x"} kelompokMap={kelompokMap} /> {kelompokMap[k] ? kelompokMap[k].nama : k}</Td>
                   <Td className="mono">{v.saldoAwal}</Td>
                   <Td className="mono" style={{ color: "#2F5D50" }}>+{v.masuk}</Td>
                   <Td className="mono" style={{ color: "#A8402A" }}>-{v.keluar}</Td>
@@ -1077,7 +1322,7 @@ function LaporanStock({ ctx }) {
           </div>
           <select value={kel} onChange={(e) => setKel(e.target.value)} style={{ ...inputStyle, width: 190 }}>
             <option value="ALL">Semua Kelompok</option>
-            {Object.entries(KELOMPOK).map(([k, v]) => <option key={k} value={k}>{v.nama}</option>)}
+            {kelompokList.map((v) => <option key={v.kode} value={v.kode}>{v.nama}</option>)}
           </select>
         </div>
         <div className="table-wrap">
@@ -1107,28 +1352,54 @@ function LaporanStock({ ctx }) {
 
 /* ============================== MASTER BARANG (Super Admin) ============================== */
 function MasterBarang({ ctx }) {
-  const { masterItems, persist, addLog, saldoByPeriode, periode } = ctx;
+  const { masterItems, persist, addLog, saldoByPeriode, periode, kelompokList, kelompokMap } = ctx;
   const saldoAwal = saldoByPeriode[periode.activeId] || {};
   const periodeAktifInfo = periode.list.find((p) => p.id === periode.activeId);
   const [q, setQ] = useState("");
-  const [form, setForm] = useState({ kode: "", nama: "", satuan: "", saldo: "", harga: "" });
+  const [form, setForm] = useState({ kelompokKode: "", subKode: "", nama: "", satuan: "", saldo: "", harga: "" });
   const [editKode, setEditKode] = useState(null);
+  const [editKodeFull, setEditKodeFull] = useState("");
   const [msg, setMsg] = useState("");
+  const [showKelBaru, setShowKelBaru] = useState(false);
+  const [kelBaruForm, setKelBaruForm] = useState({ kode: "", nama: "" });
+  const [kelMsg, setKelMsg] = useState("");
 
   const filtered = masterItems.filter((i) => !q || i.nama.toLowerCase().includes(q.toLowerCase()) || i.kode.toLowerCase().includes(q.toLowerCase())).sort((a, b) => a.kode.localeCompare(b.kode));
 
+  const kodeGabungan = editKode ? editKodeFull : (form.kelompokKode && form.subKode ? `${form.kelompokKode}.${form.subKode}` : "");
+
+  async function simpanKelompokBaru(e) {
+    e.preventDefault();
+    setKelMsg("");
+    const kode = kelBaruForm.kode.trim().toUpperCase();
+    const nama = kelBaruForm.nama.trim();
+    if (!kode || !nama) { setKelMsg("Kode dan nama kelompok wajib diisi."); return; }
+    if (kelompokList.some((k) => k.kode === kode)) { setKelMsg("Kode kelompok sudah dipakai."); return; }
+    try {
+      const created = await persist.simpanKelompok({ kode, nama });
+      await addLog("Tambah kelompok barang baru", `${created.kode} - ${created.nama}`);
+      setForm((f) => ({ ...f, kelompokKode: created.kode }));
+      setKelBaruForm({ kode: "", nama: "" });
+      setShowKelBaru(false);
+    } catch (err) {
+      setKelMsg("Gagal menyimpan kelompok: " + (err.message || String(err)));
+    }
+  }
+
   async function addItem(e) {
     e.preventDefault();
-    if (!form.kode || !form.nama || !form.satuan) { setMsg("Kode, nama, dan satuan wajib diisi."); return; }
-    if (masterItems.some((i) => i.kode === form.kode) && !editKode) { setMsg("Kode sudah dipakai."); return; }
+    const kodeFinal = kodeGabungan;
+    if (!kodeFinal || !form.nama || !form.satuan) { setMsg("Kelompok, kode sub-barang, nama, dan satuan wajib diisi."); return; }
+    if (masterItems.some((i) => i.kode === kodeFinal) && !editKode) { setMsg("Kode sudah dipakai."); return; }
     try {
-      await persist.simpanMaster({ kode: form.kode, nama: form.nama, satuan: form.satuan }, editKode);
+      await persist.simpanMaster({ kode: kodeFinal, nama: form.nama, satuan: form.satuan }, editKode);
       if (form.saldo || form.harga) {
-        await persist.upsertSaldoAwal(periode.activeId, form.kode, { saldo: Number(form.saldo) || 0, harga: Number(form.harga) || 0 });
+        await persist.upsertSaldoAwal(periode.activeId, kodeFinal, { saldo: Number(form.saldo) || 0, harga: Number(form.harga) || 0 });
       }
-      await addLog(editKode ? "Ubah master barang" : "Tambah master barang", `${form.kode} - ${form.nama}`);
-      setForm({ kode: "", nama: "", satuan: "", saldo: "", harga: "" });
+      await addLog(editKode ? "Ubah master barang" : "Tambah master barang", `${kodeFinal} - ${form.nama}`);
+      setForm({ kelompokKode: "", subKode: "", nama: "", satuan: "", saldo: "", harga: "" });
       setEditKode(null);
+      setEditKodeFull("");
       setMsg("Tersimpan.");
       setTimeout(() => setMsg(""), 2000);
     } catch (err) {
@@ -1139,7 +1410,15 @@ function MasterBarang({ ctx }) {
   function editRow(it) {
     const sa = saldoAwal[it.kode] || {};
     setEditKode(it.kode);
-    setForm({ kode: it.kode, nama: it.nama, satuan: it.satuan, saldo: sa.saldo || "", harga: sa.harga || "" });
+    setEditKodeFull(it.kode);
+    const parts = it.kode.split(".");
+    setForm({ kelompokKode: parts[0] || "", subKode: parts.slice(1).join(".") || "", nama: it.nama, satuan: it.satuan, saldo: sa.saldo || "", harga: sa.harga || "" });
+  }
+
+  function batalEdit() {
+    setEditKode(null);
+    setEditKodeFull("");
+    setForm({ kelompokKode: "", subKode: "", nama: "", satuan: "", saldo: "", harga: "" });
   }
 
   async function removeItem(kode) {
@@ -1159,7 +1438,34 @@ function MasterBarang({ ctx }) {
         <Card>
           <div className="sg" style={{ fontWeight: 700, marginBottom: 10 }}>{editKode ? "Ubah Barang" : "Tambah Barang"}</div>
           <form onSubmit={addItem}>
-            <Field label="Kode Barang"><input value={form.kode} onChange={(e) => setForm({ ...form, kode: e.target.value })} style={inputStyle} placeholder="mis. KH.01.010" disabled={!!editKode} /></Field>
+            {editKode ? (
+              <Field label="Kode Barang"><input value={editKodeFull} disabled style={inputStyle} /></Field>
+            ) : (
+              <>
+                <Field label="Kelompok Barang">
+                  <select value={form.kelompokKode} onChange={(e) => setForm({ ...form, kelompokKode: e.target.value })} style={inputStyle}>
+                    <option value="">Pilih kelompok...</option>
+                    {kelompokList.map((k) => <option key={k.kode} value={k.kode}>{k.kode} - {k.nama}</option>)}
+                  </select>
+                  <button type="button" onClick={() => setShowKelBaru((v) => !v)}
+                    style={{ marginTop: 6, background: "none", border: "none", color: "#2F5D50", fontSize: 12, fontWeight: 600, cursor: "pointer", padding: 0, display: "flex", alignItems: "center", gap: 4 }}>
+                    <Plus size={13} /> {showKelBaru ? "Batal tambah kelompok" : "Tambah kelompok baru"}
+                  </button>
+                </Field>
+                {showKelBaru && (
+                  <div style={{ background: "#F3F0E4", borderRadius: 8, padding: 12, marginBottom: 14 }}>
+                    <Field label="Kode Kelompok Baru"><input value={kelBaruForm.kode} onChange={(e) => setKelBaruForm({ ...kelBaruForm, kode: e.target.value.toUpperCase() })} style={inputStyle} placeholder="mis. MN" maxLength={6} /></Field>
+                    <Field label="Nama Kelompok Baru"><input value={kelBaruForm.nama} onChange={(e) => setKelBaruForm({ ...kelBaruForm, nama: e.target.value })} style={inputStyle} placeholder="mis. Minuman & Snack" /></Field>
+                    {kelMsg && <ErrorNote text={kelMsg} />}
+                    <button type="button" onClick={simpanKelompokBaru} style={{ ...primaryBtn, marginTop: 0 }}><Plus size={15} /> Simpan Kelompok</button>
+                  </div>
+                )}
+                <Field label="Kode Sub-Barang">
+                  <input value={form.subKode} onChange={(e) => setForm({ ...form, subKode: e.target.value })} style={inputStyle} placeholder="mis. 01.010" />
+                </Field>
+                {kodeGabungan && <div style={{ fontSize: 11.5, color: "#8B8371", marginTop: -8, marginBottom: 12 }}>Kode barang lengkap: <span className="mono" style={{ fontWeight: 700, color: "#20241F" }}>{kodeGabungan}</span></div>}
+              </>
+            )}
             <Field label="Nama Barang"><input value={form.nama} onChange={(e) => setForm({ ...form, nama: e.target.value })} style={inputStyle} /></Field>
             <Field label="Satuan"><input value={form.satuan} onChange={(e) => setForm({ ...form, satuan: e.target.value })} style={inputStyle} placeholder="kg / pcs / liter" /></Field>
             <div style={{ display: "flex", gap: 10 }}>
@@ -1169,7 +1475,7 @@ function MasterBarang({ ctx }) {
             {msg && <div style={{ fontSize: 12.5, marginBottom: 10, color: "#2F5D50" }}>{msg}</div>}
             <div style={{ display: "flex", gap: 8 }}>
               <button type="submit" style={primaryBtn}>{editKode ? <><Pencil size={15} /> Simpan Perubahan</> : <><Plus size={15} /> Tambah Barang</>}</button>
-              {editKode && <button type="button" onClick={() => { setEditKode(null); setForm({ kode: "", nama: "", satuan: "", saldo: "", harga: "" }); }} style={{ ...primaryBtn, background: "#EDE8DA", color: "#3A4038" }}><X size={15} /></button>}
+              {editKode && <button type="button" onClick={batalEdit} style={{ ...primaryBtn, background: "#EDE8DA", color: "#3A4038" }}><X size={15} /></button>}
             </div>
           </form>
         </Card>
@@ -1177,11 +1483,12 @@ function MasterBarang({ ctx }) {
           <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Cari barang..." style={{ ...inputStyle, marginBottom: 10 }} />
           <div className="table-wrap">
             <table>
-              <thead><tr>{["Kode", "Nama", "Satuan", "Saldo Awal", ""].map((h) => <Th key={h}>{h}</Th>)}</tr></thead>
+              <thead><tr>{["Kode", "Kelompok", "Nama", "Satuan", "Saldo Awal", ""].map((h) => <Th key={h}>{h}</Th>)}</tr></thead>
               <tbody>
                 {filtered.map((it) => (
                   <tr key={it.kode}>
                     <Td className="mono">{it.kode}</Td>
+                    <Td><KelompokChip kode={it.kode} kelompokMap={kelompokMap} /></Td>
                     <Td>{it.nama}</Td>
                     <Td>{it.satuan}</Td>
                     <Td className="mono">{(saldoAwal[it.kode] && saldoAwal[it.kode].saldo) || 0}</Td>

@@ -1,0 +1,15 @@
+{
+  "name": "Gudang Persediaan - SPPG",
+  "short_name": "Gudang SPPG",
+  "description": "Aplikasi gudang persediaan bahan pangan untuk SPPG.",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#F1EEE4",
+  "theme_color": "#1B2E27",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

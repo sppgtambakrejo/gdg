@@ -33,6 +33,17 @@ create table if not exists master_barang (
 );
 
 -- ------------------------------------------------------------
+-- 2b. KELOMPOK — kelompok/kategori barang (bisa ditambah dari UI Master Barang)
+-- ------------------------------------------------------------
+create table if not exists kelompok (
+  kode text primary key,
+  nama text not null,
+  color text not null default '#5B6472',
+  bg text not null default '#E7E9EC',
+  created_at timestamptz default now()
+);
+
+-- ------------------------------------------------------------
 -- 3. SUPPLIER
 -- ------------------------------------------------------------
 create table if not exists supplier (
@@ -146,6 +157,7 @@ $$;
 -- ------------------------------------------------------------
 alter table profiles enable row level security;
 alter table master_barang enable row level security;
+alter table kelompok enable row level security;
 alter table supplier enable row level security;
 alter table periode enable row level security;
 alter table saldo_awal enable row level security;
@@ -165,6 +177,11 @@ create policy "profiles_superadmin_write" on profiles for all
 
 drop policy if exists "staff_all_master_barang" on master_barang;
 create policy "staff_all_master_barang" on master_barang for all
+  using (current_profile_role() in ('admin', 'superadmin'))
+  with check (current_profile_role() in ('admin', 'superadmin'));
+
+drop policy if exists "staff_all_kelompok" on kelompok;
+create policy "staff_all_kelompok" on kelompok for all
   using (current_profile_role() in ('admin', 'superadmin'))
   with check (current_profile_role() in ('admin', 'superadmin'));
 
@@ -239,6 +256,7 @@ as $$
 declare
   result jsonb;
   j_master jsonb;
+  j_kelompok jsonb;
   j_supplier jsonb;
   j_periode jsonb;
   j_saldo jsonb;
@@ -251,6 +269,9 @@ begin
 
   select coalesce(jsonb_agg(jsonb_build_object('kode', kode, 'nama', nama, 'satuan', satuan) order by kode), '[]'::jsonb)
     into j_master from master_barang;
+
+  select coalesce(jsonb_agg(jsonb_build_object('kode', kode, 'nama', nama, 'color', color, 'bg', bg) order by kode), '[]'::jsonb)
+    into j_kelompok from kelompok;
 
   select coalesce(jsonb_agg(jsonb_build_object('id', id, 'nama', nama, 'kontak', kontak)), '[]'::jsonb)
     into j_supplier from supplier;
@@ -284,7 +305,7 @@ begin
   into j_keluar from transaksi_keluar tk join master_barang mb on mb.kode = tk.kode;
 
   result := jsonb_build_object(
-    'master', j_master, 'supplier', j_supplier, 'periode', j_periode,
+    'master', j_master, 'kelompok', j_kelompok, 'supplier', j_supplier, 'periode', j_periode,
     'saldo', j_saldo, 'masuk', j_masuk, 'keluar', j_keluar
   );
   return result;
@@ -368,4 +389,9 @@ grant execute on function tutup_periode(text, date, date) to authenticated;
 --        Barang" di aplikasi setelah login, satu per satu, atau lewat
 --        SQL Editor untuk isi massal).
 --     d. Deploy Edge Functions `create-user` & `delete-user` (lihat README).
+--     e. Tabel `kelompok` (kategori barang, mis. KH = Karbohidrat) akan otomatis
+--        diisi oleh aplikasi dengan 6 kelompok bawaan saat login pertama kali
+--        jika tabel ini masih kosong — sama seperti master_barang & periode di
+--        atas. Kelompok baru juga bisa ditambahkan langsung dari menu
+--        "Master Barang" saat menambah barang baru.
 -- ------------------------------------------------------------

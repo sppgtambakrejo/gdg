@@ -2,10 +2,18 @@
 
 Web app inventory bahan pangan (React + Vite), database Supabase, deploy otomatis ke GitHub Pages.
 
+## Pembaruan terbaru
+
+- **Tampilan mobile ala native app**: bisa di-*install* ke home screen (PWA — `public/manifest.webmanifest`, `public/sw.js`, ikon di `public/icons/`), ada tab bar bawah di layar HP, efek tekan tombol, dan aman dari notch (safe-area).
+- **Menu "Cek Stok"**: laporan stok ringkas yang realtime (langsung update kalau ada admin lain input transaksi), tanpa kolom masuk/keluar — cuma kode, kelompok, nama, satuan, stok saat ini, dan status (Aman/Menipis/Habis).
+- **Master Barang**: saat menambah barang bisa langsung membuat **kelompok baru** (kode + nama), warnanya otomatis dari palet, dan tersimpan ke tabel `kelompok` di database.
+- **Penerimaan Barang**: nama supplier tinggal ketik/pilih dari 1 kolom saja — kalau nama belum ada otomatis tersimpan ke Data Supplier (fitur ini sudah ada sebelumnya, dikonfirmasi tetap berjalan).
+- **Riwayat Penerimaan & Pengeluaran**: filter tanggal (per hari atau rentang periode) dan filter petugas/admin yang bertugas.
+
 ## 1. Setup Supabase
 
 1. Buka project Supabase kamu → **SQL Editor**.
-2. Jalankan seluruh isi `supabase/schema.sql`. Ini membuat tabel relasional (`master_barang`, `supplier`, `periode`, `saldo_awal`, `transaksi_masuk`, `transaksi_keluar`, `activity_log`, `profiles`, `app_settings`), RLS, dan fungsi RPC (`get_viewer_data`, `set_viewer_pin`, `tutup_periode`, dst). Data barang & saldo awal contoh **tidak** diisi lewat SQL — aplikasi akan mengisinya otomatis sekali saja saat login pertama kali jika tabel masih kosong (lihat bagian Arsitektur).
+2. Jalankan seluruh isi `supabase/schema.sql`. Ini membuat tabel relasional (`master_barang`, `kelompok`, `supplier`, `periode`, `saldo_awal`, `transaksi_masuk`, `transaksi_keluar`, `activity_log`, `profiles`, `app_settings`), RLS, dan fungsi RPC (`get_viewer_data`, `set_viewer_pin`, `tutup_periode`, dst). Data barang & saldo awal contoh **tidak** diisi lewat SQL — aplikasi akan mengisinya otomatis sekali saja saat login pertama kali jika tabel masih kosong (lihat bagian Arsitektur).
 3. Buat akun Super Admin pertama:
    - **Authentication → Users → Add user**
      Email: `superadmin@sppg.local`, Password: bebas (simpan baik-baik).
@@ -50,6 +58,7 @@ npm run dev
 - **Login Viewer**: PIN saja (tanpa akun Auth), divalidasi lewat RPC `get_viewer_data` yang menyusun data read-only (stok, riwayat, dsb.) langsung dari tabel-tabel relasional.
 - **Data operasional disimpan sebagai baris tabel relasional sungguhan**, bukan blob JSON:
   - `master_barang` — daftar barang (kode, nama, satuan)
+  - `kelompok` — daftar kelompok/kategori barang (kode prefix, nama, warna). 6 kelompok bawaan otomatis terisi sekali saat pertama login; kelompok baru bisa ditambah langsung dari menu **Master Barang** saat menambah barang baru.
   - `supplier` — daftar supplier
   - `periode` — daftar periode pencatatan (hanya satu yang `is_active`)
   - `saldo_awal` — saldo & harga awal per barang, per periode
