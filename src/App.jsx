@@ -1801,7 +1801,7 @@ function ManajemenUser({ ctx }) {
         <div style={{ display: "grid", gap: 16 }}>
           {isSuperAdmin && (
             <Card>
-              <div className="sg" style={{ fontWeight: 700, marginBottom: 10, display: "flex", alignItems: "center", gap: 6 }}><Users size={15} /> Akun Admin / Super Admin</div>
+              <div className="sg" style={{ fontWeight: 700, marginBottom: 10, display: "flex", alignItems: "center", gap: 6 }}><Users size={15} /> Akun Admin</div>
               <div style={{ fontSize: 11.5, color: "#8B8371", lineHeight: 1.5, marginBottom: 10 }}>
                 Akun login lengkap (username + password) dibuat langsung dari sini, tanpa perlu email.
               </div>
