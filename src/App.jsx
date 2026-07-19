@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
-import { Package, LogIn, LogOut, LayoutDashboard, ArrowDownToLine, ArrowUpFromLine, ClipboardList, Users, ScrollText, Search, Plus, Trash2, Pencil, X, KeyRound, ShieldCheck, Eye, AlertTriangle, Menu, CalendarRange, Download, Lock, ChevronDown, Truck } from "lucide-react";
+import { Package, LogIn, LogOut, LayoutDashboard, ArrowDownToLine, ArrowUpFromLine, ClipboardList, Users, ScrollText, Search, Plus, Trash2, Pencil, X, KeyRound, ShieldCheck, Eye, AlertTriangle, Menu, CalendarRange, Download, Lock, ChevronDown, Truck, RotateCcw } from "lucide-react";
 import * as XLSX from "xlsx";
 import { supabase } from "./lib/supabaseClient.js";
 
@@ -73,6 +73,19 @@ function mapKeluarRow(r) {
 function mapLogRow(r) {
   return { id: r.id, waktu: r.waktu, oleh: r.oleh, role: r.role, aksi: r.aksi, detail: r.detail };
 }
+function mapRevisiRow(r) {
+  return {
+    id: r.id, tanggal: r.tanggal, tipe: r.tipe, kode: r.kode,
+    nama: r.master_barang ? r.master_barang.nama : "", satuan: r.master_barang ? r.master_barang.satuan : "",
+    vol: Number(r.vol), jenis: r.jenis, keterangan: r.keterangan,
+    oleh: r.oleh, waktu: r.waktu, periodeId: r.periode_id,
+  };
+}
+const JENIS_REVISI = [
+  { value: "rusak", label: "Barang Rusak" },
+  { value: "retur", label: "Retur" },
+  { value: "lainnya", label: "Lainnya" },
+];
 function mapPeriodeRow(p) {
   return { id: p.id, nama: p.nama, mulai: p.mulai, selesai: p.selesai, closed: p.closed };
 }
@@ -89,6 +102,7 @@ export default function App() {
   const [loadError, setLoadError] = useState(null);
   const [masuk, setMasuk] = useState([]);
   const [keluar, setKeluar] = useState([]);
+  const [revisi, setRevisi] = useState([]);
   const [saldoByPeriode, setSaldoByPeriode] = useState({});
   const [periodeState, setPeriodeState] = useState({ list: [], activeId: null });
   const [masterItems, setMasterItems] = useState([]);
@@ -141,14 +155,15 @@ export default function App() {
     const activeRow = periodeRows.find((p) => p.is_active) || periodeRows[0];
 
     // 3) Sisanya: supplier, saldo_awal (semua periode), transaksi masuk/keluar, log.
-    const [supplierRes, saldoRes, masukRes, keluarRes, logRes] = await Promise.all([
+    const [supplierRes, saldoRes, masukRes, keluarRes, revisiRes, logRes] = await Promise.all([
       supabase.from("supplier").select("*").order("nama"),
       supabase.from("saldo_awal").select("*"),
       supabase.from("transaksi_masuk").select("*, master_barang(nama, satuan)").order("waktu", { ascending: false }),
       supabase.from("transaksi_keluar").select("*, master_barang(nama, satuan)").order("waktu", { ascending: false }),
+      supabase.from("revisi").select("*, master_barang(nama, satuan)").order("waktu", { ascending: false }),
       supabase.from("activity_log").select("*").order("waktu", { ascending: false }).limit(500),
     ]);
-    for (const r of [supplierRes, saldoRes, masukRes, keluarRes, logRes]) {
+    for (const r of [supplierRes, saldoRes, masukRes, keluarRes, revisiRes, logRes]) {
       if (r.error) throw r.error;
     }
 
@@ -164,6 +179,7 @@ export default function App() {
     setSaldoByPeriode(saldoObj);
     setMasuk((masukRes.data || []).map(mapMasukRow));
     setKeluar((keluarRes.data || []).map(mapKeluarRow));
+    setRevisi((revisiRes.data || []).map(mapRevisiRow));
     setLog((logRes.data || []).map(mapLogRow));
     setPeriodeState({ list: periodeRows.map(mapPeriodeRow), activeId: activeRow.id });
     setViewingPeriodeId(activeRow.id);
@@ -205,6 +221,7 @@ export default function App() {
   function handleLoginViewer(data) {
     setMasuk(data.masuk || []);
     setKeluar(data.keluar || []);
+    setRevisi(data.revisi || []);
     setSaldoByPeriode(data.saldo || {});
     setMasterItems(data.master || []);
     setKelompokList(data.kelompok && data.kelompok.length ? data.kelompok : DEFAULT_KELOMPOK);
@@ -250,6 +267,16 @@ export default function App() {
       if (error) throw error;
       const mapped = mapKeluarRow(data);
       setKeluar((prev) => [mapped, ...prev]);
+      return mapped;
+    },
+    tambahRevisi: async (entry) => {
+      const { data, error } = await supabase.from("revisi").insert({
+        periode_id: entry.periodeId, tanggal: entry.tanggal, tipe: entry.tipe, kode: entry.kode,
+        vol: entry.vol, jenis: entry.jenis, keterangan: entry.keterangan, oleh: entry.oleh,
+      }).select("*, master_barang(nama, satuan)").single();
+      if (error) throw error;
+      const mapped = mapRevisiRow(data);
+      setRevisi((prev) => [mapped, ...prev]);
       return mapped;
     },
     simpanMaster: async ({ kode, nama, satuan }, editKode) => {
@@ -322,7 +349,7 @@ export default function App() {
     const map = {};
     for (const it of masterItems) {
       const sa = saldoAwalPeriode[it.kode] || {};
-      map[it.kode] = { ...it, saldoAwal: sa.saldo || 0, hargaAwal: sa.harga || 0, masuk: 0, keluar: 0, hargaTerakhir: sa.harga || 0 };
+      map[it.kode] = { ...it, saldoAwal: sa.saldo || 0, hargaAwal: sa.harga || 0, masuk: 0, keluar: 0, revisiKurang: 0, revisiTambah: 0, hargaTerakhir: sa.harga || 0 };
     }
     for (const t of masuk) {
       if (t.periodeId !== periodeId || !map[t.kode]) continue;
@@ -333,11 +360,18 @@ export default function App() {
       if (t.periodeId !== periodeId || !map[t.kode]) continue;
       map[t.kode].keluar += Number(t.vol) || 0;
     }
+    // Revisi atas Penerimaan (barang rusak/retur ke supplier saat diterima) mengurangi stok;
+    // revisi atas Pengeluaran (barang rusak/retur balik ke gudang setelah keluar) mengembalikan stok.
+    for (const r of revisi) {
+      if (r.periodeId !== periodeId || !map[r.kode]) continue;
+      if (r.tipe === "keluar") map[r.kode].revisiTambah += Number(r.vol) || 0;
+      else map[r.kode].revisiKurang += Number(r.vol) || 0;
+    }
     return Object.values(map).map((it) => {
-      const saldoAkhir = it.saldoAwal + it.masuk - it.keluar;
+      const saldoAkhir = it.saldoAwal + it.masuk - it.keluar - it.revisiKurang + it.revisiTambah;
       return { ...it, saldoAkhir, nilai: saldoAkhir * (it.hargaTerakhir || 0) };
     });
-  }, [masterItems, saldoByPeriode, masuk, keluar]);
+  }, [masterItems, saldoByPeriode, masuk, keluar, revisi]);
 
   const stock = useMemo(() => computeStockFor(viewingPeriodeId), [computeStockFor, viewingPeriodeId]);
 
@@ -361,6 +395,7 @@ export default function App() {
       .channel("realtime-gudang")
       .on("postgres_changes", { event: "*", schema: "public", table: "transaksi_masuk" }, scheduleReload)
       .on("postgres_changes", { event: "*", schema: "public", table: "transaksi_keluar" }, scheduleReload)
+      .on("postgres_changes", { event: "*", schema: "public", table: "revisi" }, scheduleReload)
       .on("postgres_changes", { event: "*", schema: "public", table: "saldo_awal" }, scheduleReload)
       .on("postgres_changes", { event: "*", schema: "public", table: "master_barang" }, scheduleReload)
       .subscribe();
@@ -420,7 +455,7 @@ export default function App() {
     editPeriode,
   };
 
-  const ctx = { session, stock, masuk, keluar, masterItems, saldoByPeriode, log, persist, addLog, periode, computeStockFor, suppliers, ensureSupplier, kelompokList, kelompokMap };
+  const ctx = { session, stock, masuk, keluar, revisi, masterItems, saldoByPeriode, log, persist, addLog, periode, computeStockFor, suppliers, ensureSupplier, kelompokList, kelompokMap };
 
   return (
     <div style={{ minHeight: "100vh", background: "#F1EEE4", fontFamily: "Inter, system-ui, sans-serif", color: "#20241F" }}>
@@ -658,6 +693,7 @@ const NAV_ITEMS = [
   { key: "cekstok", label: "Cek Stok", icon: Eye, roles: ["superadmin", "admin", "viewer"] },
   { key: "masuk", label: "Penerimaan Barang", icon: ArrowDownToLine, roles: ["superadmin", "admin"] },
   { key: "keluar", label: "Pengeluaran Barang", icon: ArrowUpFromLine, roles: ["superadmin", "admin"] },
+  { key: "revisi", label: "Revisi", icon: RotateCcw, roles: ["superadmin", "admin"] },
   { key: "laporan", label: "Laporan Stock", icon: ClipboardList, roles: ["superadmin", "admin", "viewer"] },
   { key: "master", label: "Master Barang", icon: Package, roles: ["superadmin"] },
   { key: "supplier", label: "Data Supplier", icon: Truck, roles: ["superadmin", "admin"] },
@@ -726,6 +762,7 @@ function PageRouter({ page, ctx }) {
     case "cekstok": return <StokRealtime ctx={ctx} />;
     case "masuk": return <Penerimaan ctx={ctx} />;
     case "keluar": return <Pengeluaran ctx={ctx} />;
+    case "revisi": return <Revisi ctx={ctx} />;
     case "laporan": return <LaporanStock ctx={ctx} />;
     case "master": return <MasterBarang ctx={ctx} />;
     case "supplier": return <DataSupplier ctx={ctx} />;
@@ -1155,6 +1192,101 @@ function Pengeluaran({ ctx }) {
                   </tr>
                 ))}
                 {mine.length === 0 && <tr><td colSpan={4}><Empty text="Belum ada data." /></td></tr>}
+              </tbody>
+            </table>
+          </div>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
+/* ============================== REVISI (BARANG RUSAK / RETUR / LAINNYA) ============================== */
+function Revisi({ ctx }) {
+  const { masterItems, revisi, persist, session, addLog, stock, periode, kelompokMap } = ctx;
+  const isArsip = periode.viewingId !== periode.activeId;
+  const [form, setForm] = useState({ tanggal: todayInput(), tipe: "masuk", kode: "", vol: "", jenis: "rusak", keterangan: "" });
+  const [msg, setMsg] = useState("");
+
+  async function submit(e) {
+    e.preventDefault();
+    const item = masterItems.find((i) => i.kode === form.kode);
+    if (!item || !form.vol || Number(form.vol) <= 0) { setMsg("Lengkapi barang dan volume terlebih dahulu."); return; }
+    // Revisi Penerimaan mengurangi stok, jadi jumlahnya tidak boleh melebihi stok yang tersedia sekarang.
+    if (form.tipe === "masuk") {
+      const st = stock.find((s) => s.kode === item.kode);
+      if (st && Number(form.vol) > st.saldoAkhir) { setMsg(`Stok tidak cukup untuk direvisi. Sisa stok: ${st.saldoAkhir} ${item.satuan}.`); return; }
+    }
+    try {
+      const entry = await persist.tambahRevisi({
+        tanggal: form.tanggal, tipe: form.tipe, kode: item.kode, vol: Number(form.vol),
+        jenis: form.jenis, keterangan: form.keterangan, oleh: session.nama, periodeId: periode.activeId,
+      });
+      const jenisLabel = JENIS_REVISI.find((j) => j.value === form.jenis)?.label || form.jenis;
+      const arahLabel = form.tipe === "masuk" ? "Penerimaan (stok berkurang)" : "Pengeluaran (stok kembali)";
+      await addLog("Revisi transaksi", `${item.nama} ${form.tipe === "masuk" ? "-" : "+"}${entry.vol} ${item.satuan} · ${jenisLabel} · ${arahLabel}`);
+      setForm({ tanggal: todayInput(), tipe: "masuk", kode: "", vol: "", jenis: "rusak", keterangan: "" });
+      setMsg("Tersimpan.");
+      setTimeout(() => setMsg(""), 2000);
+    } catch (err) {
+      setMsg("Gagal menyimpan ke Supabase: " + (err.message || String(err)));
+    }
+  }
+
+  const mineAll = revisi.filter((t) => t.periodeId === periode.viewingId).sort((a, b) => new Date(b.waktu) - new Date(a.waktu));
+  const [mine, setMine] = useState(mineAll);
+
+  return (
+    <div>
+      <PageHeader title="Revisi" subtitle="Koreksi transaksi Penerimaan atau Pengeluaran akibat barang rusak, retur, atau alasan lainnya. Bisa dilakukan oleh Admin maupun Super Admin." />
+      {isArsip && <ArsipNotice />}
+      <div className="grid-2">
+        {!isArsip && (
+          <Card>
+            <form onSubmit={submit}>
+              <Field label="Tanggal"><input type="date" value={form.tanggal} onChange={(e) => setForm({ ...form, tanggal: e.target.value })} style={inputStyle} /></Field>
+              <Field label="Revisi Atas Transaksi">
+                <select value={form.tipe} onChange={(e) => setForm({ ...form, tipe: e.target.value })} style={inputStyle}>
+                  <option value="masuk">Penerimaan Barang (stok akan berkurang)</option>
+                  <option value="keluar">Pengeluaran Barang (stok akan kembali)</option>
+                </select>
+              </Field>
+              <Field label="Barang"><ItemPicker items={masterItems} value={form.kode} onChange={(v) => setForm({ ...form, kode: v })} kelompokMap={kelompokMap} /></Field>
+              <div style={{ display: "flex", gap: 10 }}>
+                <div style={{ flex: 1 }}><Field label="Volume"><input type="number" min="0" value={form.vol} onChange={(e) => setForm({ ...form, vol: e.target.value })} style={inputStyle} /></Field></div>
+                <div style={{ flex: 1 }}>
+                  <Field label="Jenis Revisi">
+                    <select value={form.jenis} onChange={(e) => setForm({ ...form, jenis: e.target.value })} style={inputStyle}>
+                      {JENIS_REVISI.map((j) => <option key={j.value} value={j.value}>{j.label}</option>)}
+                    </select>
+                  </Field>
+                </div>
+              </div>
+              <Field label="Keterangan (opsional)"><input value={form.keterangan} onChange={(e) => setForm({ ...form, keterangan: e.target.value })} style={inputStyle} placeholder="mis. dus penyok saat diterima" /></Field>
+              {msg && <div style={{ fontSize: 12.5, color: msg.includes("cukup") ? "#A8402A" : "#2F5D50", marginBottom: 10 }}>{msg}</div>}
+              <button type="submit" style={primaryBtn}><RotateCcw size={16} /> Simpan Revisi</button>
+            </form>
+          </Card>
+        )}
+        <Card style={{ maxHeight: 520, overflowY: "auto" }}>
+          <div className="sg" style={{ fontWeight: 700, marginBottom: 10 }}>Riwayat Revisi</div>
+          <RiwayatFilterBar rows={mineAll} onFiltered={setMine} />
+          <div className="table-wrap">
+            <table>
+              <thead><tr>{["Tanggal", "Atas", "Barang", "Vol", "Jenis", "Keterangan", "Oleh"].map((h) => <Th key={h}>{h}</Th>)}</tr></thead>
+              <tbody>
+                {mine.map((t) => (
+                  <tr key={t.id}>
+                    <Td>{t.tanggal}</Td>
+                    <Td>{t.tipe === "masuk" ? "Penerimaan" : "Pengeluaran"}</Td>
+                    <Td>{t.nama}</Td>
+                    <Td className="mono">{t.tipe === "masuk" ? "-" : "+"}{t.vol} {t.satuan}</Td>
+                    <Td>{JENIS_REVISI.find((j) => j.value === t.jenis)?.label || t.jenis}</Td>
+                    <Td>{t.keterangan || "-"}</Td>
+                    <Td>{t.oleh}<div style={{ fontSize: 10, color: "#A39B87" }}>{fmtDate(t.waktu)}</div></Td>
+                  </tr>
+                ))}
+                {mine.length === 0 && <tr><td colSpan={7}><Empty text="Belum ada data." /></td></tr>}
               </tbody>
             </table>
           </div>
