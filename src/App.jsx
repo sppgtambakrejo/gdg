@@ -35,6 +35,23 @@ function fmtRp(n) {
   n = Number(n) || 0;
   return "Rp " + n.toLocaleString("id-ID");
 }
+// Terima input angka desimal dengan koma (,) ATAU titik (.) sebagai pemisah desimal —
+// beberapa browser/HP memblokir salah satunya pada <input type="number"> tergantung locale,
+// jadi input dibuat sebagai teks biasa lalu dibersihkan & dikonversi lewat 2 fungsi ini.
+function sanitizeDecimal(v) {
+  // Hanya izinkan angka, koma, dan titik saat mengetik; buang karakter lain.
+  let s = String(v).replace(/[^0-9.,]/g, "");
+  // Hanya izinkan satu pemisah desimal (koma atau titik, yang pertama diketik yang dipakai).
+  const firstSep = s.search(/[.,]/);
+  if (firstSep !== -1) {
+    s = s.slice(0, firstSep + 1) + s.slice(firstSep + 1).replace(/[.,]/g, "");
+  }
+  return s;
+}
+function toNum(v) {
+  if (v === undefined || v === null || v === "") return 0;
+  return Number(String(v).replace(",", ".")) || 0;
+}
 function fmtDate(iso) {
   if (!iso) return "-";
   const d = new Date(iso);
@@ -1057,12 +1074,12 @@ function Penerimaan({ ctx }) {
   async function submit(e) {
     e.preventDefault();
     const item = masterItems.find((i) => i.kode === form.kode);
-    if (!item || !form.vol || Number(form.vol) <= 0) { setMsg("Lengkapi barang dan volume terlebih dahulu."); return; }
+    if (!item || !form.vol || toNum(form.vol) <= 0) { setMsg("Lengkapi barang dan volume terlebih dahulu."); return; }
     const namaSupplier = await ensureSupplier(form.supplier);
     try {
       const entry = await persist.tambahMasuk({
         tanggal: form.tanggal, supplier: namaSupplier, kode: item.kode,
-        vol: Number(form.vol), harga: Number(form.harga) || 0, oleh: session.nama, periodeId: periode.activeId,
+        vol: toNum(form.vol), harga: toNum(form.harga), oleh: session.nama, periodeId: periode.activeId,
       });
       await addLog("Penerimaan barang", `${item.nama} +${entry.vol} ${item.satuan}`);
       setForm({ tanggal: todayInput(), supplier: "", kode: "", vol: "", harga: "" });
@@ -1088,8 +1105,8 @@ function Penerimaan({ ctx }) {
               <Field label="Nama Supplier"><SupplierPicker suppliers={suppliers} value={form.supplier} onChange={(v) => setForm({ ...form, supplier: v })} /></Field>
               <Field label="Barang"><ItemPicker items={masterItems} value={form.kode} onChange={(v) => setForm({ ...form, kode: v })} kelompokMap={kelompokMap} /></Field>
               <div style={{ display: "flex", gap: 10 }}>
-                <div style={{ flex: 1 }}><Field label="Volume"><input type="number" min="0" value={form.vol} onChange={(e) => setForm({ ...form, vol: e.target.value })} style={inputStyle} /></Field></div>
-                <div style={{ flex: 1 }}><Field label="Harga Beli / satuan"><input type="number" min="0" value={form.harga} onChange={(e) => setForm({ ...form, harga: e.target.value })} style={inputStyle} /></Field></div>
+                <div style={{ flex: 1 }}><Field label="Volume"><input type="text" inputMode="decimal" value={form.vol} onChange={(e) => setForm({ ...form, vol: sanitizeDecimal(e.target.value) })} style={inputStyle} /></Field></div>
+                <div style={{ flex: 1 }}><Field label="Harga Beli / satuan"><input type="text" inputMode="decimal" value={form.harga} onChange={(e) => setForm({ ...form, harga: sanitizeDecimal(e.target.value) })} style={inputStyle} /></Field></div>
               </div>
               {msg && <div style={{ fontSize: 12.5, color: "#2F5D50", marginBottom: 10 }}>{msg}</div>}
               <button type="submit" style={primaryBtn}><Plus size={16} /> Simpan Penerimaan</button>
@@ -1141,12 +1158,12 @@ function Pengeluaran({ ctx }) {
   async function submit(e) {
     e.preventDefault();
     const item = masterItems.find((i) => i.kode === form.kode);
-    if (!item || !form.vol || Number(form.vol) <= 0) { setMsg("Lengkapi barang dan volume terlebih dahulu."); return; }
+    if (!item || !form.vol || toNum(form.vol) <= 0) { setMsg("Lengkapi barang dan volume terlebih dahulu."); return; }
     const st = stock.find((s) => s.kode === item.kode);
-    if (st && Number(form.vol) > st.saldoAkhir) { setMsg(`Stok tidak cukup. Sisa stok: ${st.saldoAkhir} ${item.satuan}.`); return; }
+    if (st && toNum(form.vol) > st.saldoAkhir) { setMsg(`Stok tidak cukup. Sisa stok: ${st.saldoAkhir} ${item.satuan}.`); return; }
     try {
       const entry = await persist.tambahKeluar({
-        tanggal: form.tanggal, kode: item.kode, vol: Number(form.vol), oleh: session.nama, periodeId: periode.activeId,
+        tanggal: form.tanggal, kode: item.kode, vol: toNum(form.vol), oleh: session.nama, periodeId: periode.activeId,
       });
       await addLog("Pengeluaran barang", `${item.nama} -${entry.vol} ${item.satuan}`);
       setForm({ tanggal: todayInput(), kode: "", vol: "" });
@@ -1170,7 +1187,7 @@ function Pengeluaran({ ctx }) {
             <form onSubmit={submit}>
               <Field label="Tanggal"><input type="date" value={form.tanggal} onChange={(e) => setForm({ ...form, tanggal: e.target.value })} style={inputStyle} /></Field>
               <Field label="Barang"><ItemPicker items={masterItems} value={form.kode} onChange={(v) => setForm({ ...form, kode: v })} kelompokMap={kelompokMap} /></Field>
-              <Field label="Volume"><input type="number" min="0" value={form.vol} onChange={(e) => setForm({ ...form, vol: e.target.value })} style={inputStyle} /></Field>
+              <Field label="Volume"><input type="text" inputMode="decimal" value={form.vol} onChange={(e) => setForm({ ...form, vol: sanitizeDecimal(e.target.value) })} style={inputStyle} /></Field>
               {msg && <div style={{ fontSize: 12.5, color: msg.includes("cukup") ? "#A8402A" : "#2F5D50", marginBottom: 10 }}>{msg}</div>}
               <button type="submit" style={primaryBtn}><Plus size={16} /> Simpan Pengeluaran</button>
             </form>
@@ -1211,15 +1228,15 @@ function Revisi({ ctx }) {
   async function submit(e) {
     e.preventDefault();
     const item = masterItems.find((i) => i.kode === form.kode);
-    if (!item || !form.vol || Number(form.vol) <= 0) { setMsg("Lengkapi barang dan volume terlebih dahulu."); return; }
+    if (!item || !form.vol || toNum(form.vol) <= 0) { setMsg("Lengkapi barang dan volume terlebih dahulu."); return; }
     // Revisi Penerimaan mengurangi stok, jadi jumlahnya tidak boleh melebihi stok yang tersedia sekarang.
     if (form.tipe === "masuk") {
       const st = stock.find((s) => s.kode === item.kode);
-      if (st && Number(form.vol) > st.saldoAkhir) { setMsg(`Stok tidak cukup untuk direvisi. Sisa stok: ${st.saldoAkhir} ${item.satuan}.`); return; }
+      if (st && toNum(form.vol) > st.saldoAkhir) { setMsg(`Stok tidak cukup untuk direvisi. Sisa stok: ${st.saldoAkhir} ${item.satuan}.`); return; }
     }
     try {
       const entry = await persist.tambahRevisi({
-        tanggal: form.tanggal, tipe: form.tipe, kode: item.kode, vol: Number(form.vol),
+        tanggal: form.tanggal, tipe: form.tipe, kode: item.kode, vol: toNum(form.vol),
         jenis: form.jenis, keterangan: form.keterangan, oleh: session.nama, periodeId: periode.activeId,
       });
       const jenisLabel = JENIS_REVISI.find((j) => j.value === form.jenis)?.label || form.jenis;
@@ -1253,7 +1270,7 @@ function Revisi({ ctx }) {
               </Field>
               <Field label="Barang"><ItemPicker items={masterItems} value={form.kode} onChange={(v) => setForm({ ...form, kode: v })} kelompokMap={kelompokMap} /></Field>
               <div style={{ display: "flex", gap: 10 }}>
-                <div style={{ flex: 1 }}><Field label="Volume"><input type="number" min="0" value={form.vol} onChange={(e) => setForm({ ...form, vol: e.target.value })} style={inputStyle} /></Field></div>
+                <div style={{ flex: 1 }}><Field label="Volume"><input type="text" inputMode="decimal" value={form.vol} onChange={(e) => setForm({ ...form, vol: sanitizeDecimal(e.target.value) })} style={inputStyle} /></Field></div>
                 <div style={{ flex: 1 }}>
                   <Field label="Jenis Revisi">
                     <select value={form.jenis} onChange={(e) => setForm({ ...form, jenis: e.target.value })} style={inputStyle}>
@@ -1526,7 +1543,7 @@ function MasterBarang({ ctx }) {
     try {
       await persist.simpanMaster({ kode: kodeFinal, nama: form.nama, satuan: form.satuan }, editKode);
       if (form.saldo || form.harga) {
-        await persist.upsertSaldoAwal(periode.activeId, kodeFinal, { saldo: Number(form.saldo) || 0, harga: Number(form.harga) || 0 });
+        await persist.upsertSaldoAwal(periode.activeId, kodeFinal, { saldo: toNum(form.saldo), harga: toNum(form.harga) });
       }
       await addLog(editKode ? "Ubah master barang" : "Tambah master barang", `${kodeFinal} - ${form.nama}`);
       setForm({ kelompokKode: "", subKode: "", nama: "", satuan: "", saldo: "", harga: "" });
@@ -1601,8 +1618,8 @@ function MasterBarang({ ctx }) {
             <Field label="Nama Barang"><input value={form.nama} onChange={(e) => setForm({ ...form, nama: e.target.value })} style={inputStyle} /></Field>
             <Field label="Satuan"><input value={form.satuan} onChange={(e) => setForm({ ...form, satuan: e.target.value })} style={inputStyle} placeholder="kg / pcs / liter" /></Field>
             <div style={{ display: "flex", gap: 10 }}>
-              <div style={{ flex: 1 }}><Field label={`Saldo Awal (${periodeAktifInfo ? periodeAktifInfo.nama : "periode aktif"})`}><input type="number" value={form.saldo} onChange={(e) => setForm({ ...form, saldo: e.target.value })} style={inputStyle} /></Field></div>
-              <div style={{ flex: 1 }}><Field label="Harga Awal"><input type="number" value={form.harga} onChange={(e) => setForm({ ...form, harga: e.target.value })} style={inputStyle} /></Field></div>
+              <div style={{ flex: 1 }}><Field label={`Saldo Awal (${periodeAktifInfo ? periodeAktifInfo.nama : "periode aktif"})`}><input type="text" inputMode="decimal" value={form.saldo} onChange={(e) => setForm({ ...form, saldo: sanitizeDecimal(e.target.value) })} style={inputStyle} /></Field></div>
+              <div style={{ flex: 1 }}><Field label="Harga Awal"><input type="text" inputMode="decimal" value={form.harga} onChange={(e) => setForm({ ...form, harga: sanitizeDecimal(e.target.value) })} style={inputStyle} /></Field></div>
             </div>
             {msg && <div style={{ fontSize: 12.5, marginBottom: 10, color: "#2F5D50" }}>{msg}</div>}
             <div style={{ display: "flex", gap: 8 }}>
