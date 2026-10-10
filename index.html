@@ -110,8 +110,104 @@
   body.entered #mute { opacity: .6; }
   #mute:hover { opacity: 1; }
 
+  /* Exhaustion: the whole verse sags like a long sigh */
+  .verse { animation: sigh 9s ease-in-out infinite; transform-origin: 50% 60%; }
+  @keyframes sigh {
+    0%, 100% { transform: scale(1) translateY(0); }
+    55% { transform: scale(.982) translateY(5px); }
+  }
+
+  /* Anger: the first line snaps, glitches, bleeds red - then goes quiet again */
+  .line:first-child { animation: rage 7s steps(1, end) infinite; }
+  @keyframes rage {
+    0%, 91%, 100% { transform: none; text-shadow: none; color: var(--bone); }
+    92% { transform: translate(-4px, 1px) skewX(-5deg); text-shadow: 4px 0 #9b1111, -4px 0 #1b3550; color: #f0d9d3; }
+    93% { transform: translate(5px, -2px) skewX(4deg); text-shadow: -5px 0 #9b1111, 5px 0 #1b3550; }
+    94% { transform: translate(-2px, 2px) skewX(-2deg); text-shadow: 3px 1px #c01515, -3px -1px #1b3550; color: #f0d9d3; }
+    95% { transform: translate(3px, 0); text-shadow: 2px 0 #9b1111; }
+    96% { transform: none; text-shadow: none; color: var(--bone); }
+  }
+  #rage {
+    position: fixed; inset: 0; z-index: 4; pointer-events: none;
+    background: radial-gradient(ellipse at 50% 45%, rgba(150,14,14,.5), rgba(60,0,0,.15) 60%, rgba(0,0,0,0) 80%);
+    opacity: 0;
+    animation: rageflash 7s steps(1, end) infinite;
+  }
+  @keyframes rageflash {
+    0%, 91%, 100% { opacity: 0; }
+    92% { opacity: .55; }
+    93% { opacity: .1; }
+    94% { opacity: .45; }
+    96% { opacity: .15; }
+    97% { opacity: 0; }
+  }
+
+  /* Weariness: heavy eyelids fight to close, then jerk back open */
+  .lid {
+    position: fixed; left: 0; right: 0; z-index: 4; pointer-events: none;
+    height: 0; background: #000;
+    animation: droop 16s ease-in-out infinite;
+  }
+  .lid.top { top: 0; background: linear-gradient(#000 70%, rgba(0,0,0,0)); }
+  .lid.bot { bottom: 0; background: linear-gradient(rgba(0,0,0,0), #000 30%); animation-name: droop-bot; }
+  @keyframes droop {
+    0%, 55% { height: 0; }
+    70% { height: 30vh; }
+    74% { height: 24vh; }
+    82% { height: 36vh; }
+    86% { height: 0; }
+    100% { height: 0; }
+  }
+  @keyframes droop-bot {
+    0%, 55% { height: 0; }
+    70% { height: 24vh; }
+    74% { height: 19vh; }
+    82% { height: 30vh; }
+    86% { height: 0; }
+    100% { height: 0; }
+  }
+
+  /* Falling ash */
+  #ash { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 2; pointer-events: none; }
+
+  /* Muttered fragments that surface and sink */
+  #whispers { position: fixed; inset: 0; z-index: 3; pointer-events: none; overflow: hidden; }
+  .whisper {
+    position: absolute;
+    font-style: italic; font-weight: 300;
+    color: var(--ash);
+    opacity: 0;
+    white-space: nowrap;
+    animation: surface 7s ease-in-out forwards, tremble .8s ease-in-out infinite;
+    --x1: .5px; --y1: -.4px; --x2: -.5px; --y2: .4px; --x3: .4px; --y3: .5px;
+  }
+  .whisper.sharp { color: #8a3a35; font-style: normal; letter-spacing: .08em; }
+  @keyframes surface {
+    0% { opacity: 0; margin-top: 0; }
+    30% { opacity: .42; }
+    100% { opacity: 0; margin-top: 18px; }
+  }
+
+  /* System log: a machine giving up, line by line */
+  #log {
+    position: fixed; z-index: 3; pointer-events: none;
+    left: max(1.1rem, env(safe-area-inset-left));
+    bottom: max(1.1rem, env(safe-area-inset-bottom));
+    max-width: 62vw;
+    font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+    font-size: .68rem; line-height: 1.7;
+    color: #5d5a58;
+    opacity: 0; transition: opacity 4s ease 3s;
+  }
+  body.entered #log { opacity: 1; }
+  #log div { animation: logIn .6s steps(8) both; }
+  #log div.fatal { color: #8a3a35; }
+  @keyframes logIn { from { opacity: 0; } to { opacity: 1; } }
+
   @media (prefers-reduced-motion: reduce) {
-    .w, body::after, #gate span { animation: none; }
+    .w, body::after, #gate span, .verse, .line:first-child, #rage, .lid, .whisper { animation: none; }
+    .whisper { opacity: .3; }
+    .lid, #rage { display: none; }
   }
 </style>
 </head>
@@ -127,6 +223,13 @@
     <span class="line">No restart. No return. No more.</span>
   </p>
 </main>
+
+<canvas id="ash" aria-hidden="true"></canvas>
+<div id="whispers" aria-hidden="true"></div>
+<div id="log" aria-hidden="true"></div>
+<div id="rage" aria-hidden="true"></div>
+<div class="lid top" aria-hidden="true"></div>
+<div class="lid bot" aria-hidden="true"></div>
 
 <button id="mute" type="button" aria-pressed="false">silence</button>
 
@@ -234,9 +337,105 @@
     }
   }
 
+  /* ---------- Falling ash (exhaustion) ---------- */
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var canvas = document.getElementById("ash");
+  var c2d = canvas.getContext("2d");
+  var flakes = [], W = 0, H = 0, dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+  function resize() {
+    W = window.innerWidth; H = window.innerHeight;
+    canvas.width = W * dpr; canvas.height = H * dpr;
+    c2d.setTransform(dpr, 0, 0, dpr, 0, 0);
+    var n = Math.round(Math.min(110, Math.max(45, W * H / 11000)));
+    flakes = [];
+    for (var i = 0; i < n; i++) flakes.push(newFlake(true));
+  }
+  function newFlake(anywhere) {
+    return {
+      x: Math.random() * W,
+      y: anywhere ? Math.random() * H : -10,
+      r: Math.random() * 1.6 + .4,
+      vy: Math.random() * .35 + .12,
+      sw: Math.random() * 1.5 + .3,
+      ph: Math.random() * 6.28,
+      a: Math.random() * .35 + .1
+    };
+  }
+  function drawAsh(t) {
+    c2d.clearRect(0, 0, W, H);
+    for (var i = 0; i < flakes.length; i++) {
+      var f = flakes[i];
+      f.y += f.vy;
+      var x = f.x + Math.sin(t / 2200 + f.ph) * f.sw * 8;
+      if (f.y > H + 10) flakes[i] = newFlake(false);
+      c2d.beginPath();
+      c2d.fillStyle = "rgba(170,165,160," + f.a + ")";
+      c2d.arc(x, f.y, f.r, 0, 6.283);
+      c2d.fill();
+    }
+    requestAnimationFrame(drawAsh);
+  }
+  resize();
+  window.addEventListener("resize", resize);
+  if (!reduce) requestAnimationFrame(drawAsh);
+
+  /* ---------- Whispers (tired, sick of it, angry) ---------- */
+  var fragments = [
+    "tired.", "so tired.", "sick of it.", "why bother.", "i'm done.", "no one listened.",
+    "again.", "enough.", "i said enough.", "nothing left.", "stop asking.", "heavy.",
+    "too long.", "for what.", "i can't.", "worthless.", "no more patience.", "fine. burn it."
+  ];
+  var sharp = ["ENOUGH.", "I'M DONE.", "STOP.", "NO."];
+  var wBox = document.getElementById("whispers");
+
+  function whisper() {
+    var el = document.createElement("span");
+    var angry = Math.random() < .18;
+    el.className = "whisper" + (angry ? " sharp" : "");
+    var list = angry ? sharp : fragments;
+    el.textContent = list[Math.floor(Math.random() * list.length)];
+    el.style.left = (4 + Math.random() * 66) + "%";
+    el.style.top = (6 + Math.random() * 84) + "%";
+    el.style.fontSize = (angry ? 1 : 1 + Math.random() * .7) + "rem";
+    el.style.transform = "rotate(" + ((Math.random() - .5) * 8).toFixed(1) + "deg)";
+    wBox.appendChild(el);
+    setTimeout(function () { el.remove(); }, 7200);
+    setTimeout(whisper, 2200 + Math.random() * 3200);
+  }
+
+  /* ---------- System log (a machine giving up) ---------- */
+  var logLines = [
+    "error 401: trust revoked",
+    "retry 1/\u221e ... failed",
+    "support ticket #0 ... ignored",
+    "patience: 0%",
+    "retry 2/\u221e ... failed",
+    "heartbeat: not found",
+    "morale: unreachable",
+    "retry 3/\u221e ... why",
+    "fatal: nobody is coming",
+    "exit code 1",
+    "exit code 1",
+    "exit code 1"
+  ];
+  var logBox = document.getElementById("log"), logI = 0;
+  function logTick() {
+    var d = document.createElement("div");
+    var txt = logLines[logI % logLines.length];
+    d.textContent = "> " + txt;
+    if (/fatal|exit/.test(txt)) d.className = "fatal";
+    logBox.appendChild(d);
+    while (logBox.children.length > 4) logBox.removeChild(logBox.firstChild);
+    logI++;
+    setTimeout(logTick, 2000 + Math.random() * 2200);
+  }
+
   document.getElementById("gate").addEventListener("click", function () {
     document.body.classList.add("entered");
     startAudio();
+    setTimeout(whisper, 3500);
+    setTimeout(logTick, 2500);
   });
 
   document.getElementById("mute").addEventListener("click", function () {
