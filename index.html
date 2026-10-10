@@ -1,22 +1,252 @@
-<!doctype html>
-<html lang="id">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <title>Gudang Persediaan · SPPG</title>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#050506">
+<title>No more.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #050506;
+    --ash: #7d7a78;
+    --bone: #d4cdc3;
+    --rust: #3a0b0b;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; background: var(--ink); }
+  body {
+    color: var(--bone);
+    font-family: "Cormorant Garamond", Georgia, "Times New Roman", serif;
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
 
-    <!-- PWA: memungkinkan aplikasi di-install ke home screen dan tampil seperti native app -->
-    <link rel="manifest" href="%BASE_URL%manifest.webmanifest" />
-    <meta name="theme-color" content="#1B2E27" />
-    <meta name="mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-title" content="Gudang SPPG" />
-    <link rel="apple-touch-icon" href="%BASE_URL%icons/icon-192.png" />
-    <link rel="icon" href="%BASE_URL%icons/icon-192.png" />
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+  /* Vignette + grain */
+  body::before {
+    content: "";
+    position: fixed; inset: 0; pointer-events: none; z-index: 1;
+    background:
+      radial-gradient(ellipse at 50% 42%, rgba(58,11,11,.28) 0%, rgba(5,5,6,0) 55%),
+      radial-gradient(ellipse at center, rgba(0,0,0,0) 40%, rgba(0,0,0,.85) 100%);
+  }
+  body::after {
+    content: "";
+    position: fixed; inset: -50%; pointer-events: none; z-index: 2;
+    opacity: .09;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    animation: grain 1.2s steps(6) infinite;
+  }
+  @keyframes grain {
+    0% { transform: translate(0,0); }
+    20% { transform: translate(-3%,2%); }
+    40% { transform: translate(2%,-3%); }
+    60% { transform: translate(-2%,-1%); }
+    80% { transform: translate(3%,3%); }
+    100% { transform: translate(0,0); }
+  }
+
+  main {
+    position: relative; z-index: 3;
+    min-height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    padding: max(2rem, env(safe-area-inset-top)) 1.5rem max(2rem, env(safe-area-inset-bottom));
+  }
+  .verse {
+    max-width: 34rem;
+    text-align: center;
+    font-weight: 300;
+    font-size: clamp(1.45rem, 5.2vw, 2.35rem);
+    line-height: 1.55;
+    letter-spacing: .01em;
+    opacity: 0;
+    transition: opacity 4s ease;
+  }
+  body.entered .verse { opacity: 1; }
+  .line { display: block; margin-bottom: 1.1em; }
+  .line:first-child { font-weight: 500; }
+  .line:last-child { color: var(--ash); font-style: italic; margin-bottom: 0; }
+
+  /* The tremble: each word shakes slightly on its own rhythm */
+  .w {
+    display: inline-block;
+    animation: tremble var(--d, .9s) ease-in-out var(--delay, 0s) infinite;
+  }
+  @keyframes tremble {
+    0%   { transform: translate(0,0) rotate(0); }
+    20%  { transform: translate(var(--x1,.6px), var(--y1,-.5px)) rotate(.15deg); }
+    45%  { transform: translate(var(--x2,-.5px), var(--y2,.4px)) rotate(-.2deg); }
+    70%  { transform: translate(var(--x3,.4px), var(--y3,.6px)) rotate(.1deg); }
+    100% { transform: translate(0,0) rotate(0); }
+  }
+
+  /* Entry gate (needed because browsers block autoplay audio) */
+  #gate {
+    position: fixed; inset: 0; z-index: 10;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--ink);
+    color: var(--ash);
+    font-family: inherit; font-size: 1.25rem; font-style: italic; letter-spacing: .12em;
+    border: 0; cursor: pointer; width: 100%;
+    transition: opacity 2.5s ease, visibility 0s 2.5s;
+  }
+  #gate span { animation: breathe 3.5s ease-in-out infinite; }
+  @keyframes breathe { 0%,100% { opacity: .35; } 50% { opacity: 1; } }
+  body.entered #gate { opacity: 0; visibility: hidden; pointer-events: none; }
+  #gate:focus-visible, #mute:focus-visible { outline: 1px solid var(--ash); outline-offset: 6px; }
+
+  #mute {
+    position: fixed; z-index: 5;
+    right: max(1.1rem, env(safe-area-inset-right));
+    bottom: max(1.1rem, env(safe-area-inset-bottom));
+    background: none; border: 0; cursor: pointer;
+    color: var(--ash); font-family: inherit; font-size: 1rem; font-style: italic;
+    opacity: 0; transition: opacity 4s ease 2s;
+    padding: .5rem;
+  }
+  body.entered #mute { opacity: .6; }
+  #mute:hover { opacity: 1; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .w, body::after, #gate span { animation: none; }
+  }
+</style>
+</head>
+<body>
+
+<button id="gate" type="button" aria-label="Enter"><span>tap to enter</span></button>
+
+<main>
+  <p class="verse" id="verse">
+    <span class="line">Enough is enough.</span>
+    <span class="line">The system has failed, the trust is gone, and nothing remains worth saving.</span>
+    <span class="line">Shut it down. Let it go dark.</span>
+    <span class="line">No restart. No return. No more.</span>
+  </p>
+</main>
+
+<button id="mute" type="button" aria-pressed="false">silence</button>
+
+<div id="yt-holder" aria-hidden="true" style="position:fixed;left:-9999px;width:1px;height:1px;overflow:hidden"></div>
+
+<script>
+(function () {
+  /* ---------- MUSIC SETTINGS ----------
+     Pilih salah satu (kosongkan sisanya):
+     1) AUDIO_SRC : path file musik sendiri, mis. "dark.mp3" (paling stabil, disarankan)
+     2) YT_ID     : ID video YouTube, mis. "abc123XYZ" (dari youtube.com/watch?v=ID)
+     3) Jika dua-duanya kosong, halaman memakai drone gelap buatan (tanpa file). */
+  var AUDIO_SRC = "";
+  var YT_ID = "";
+
+  /* ---------- Tremble: split text into words with random shake ---------- */
+  var rnd = function (a, b) { return (Math.random() * (b - a) + a).toFixed(2); };
+  document.querySelectorAll(".line").forEach(function (line) {
+    var words = line.textContent.trim().split(/\s+/);
+    line.textContent = "";
+    words.forEach(function (word, i) {
+      var s = document.createElement("span");
+      s.className = "w";
+      s.textContent = word;
+      s.style.setProperty("--d", rnd(0.6, 1.3) + "s");
+      s.style.setProperty("--delay", "-" + rnd(0, 1.5) + "s");
+      s.style.setProperty("--x1", rnd(-.9, .9) + "px");
+      s.style.setProperty("--y1", rnd(-.8, .8) + "px");
+      s.style.setProperty("--x2", rnd(-.9, .9) + "px");
+      s.style.setProperty("--y2", rnd(-.8, .8) + "px");
+      s.style.setProperty("--x3", rnd(-.9, .9) + "px");
+      s.style.setProperty("--y3", rnd(-.8, .8) + "px");
+      line.appendChild(s);
+      if (i < words.length - 1) line.appendChild(document.createTextNode(" "));
+    });
+  });
+
+  /* ---------- Audio ---------- */
+  var ctx, master, fileAudio, muted = false, started = false;
+
+  function startDrone() {
+    var AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return;
+    ctx = new AC();
+    master = ctx.createGain();
+    master.gain.value = 0;
+    master.gain.linearRampToValueAtTime(0.5, ctx.currentTime + 8);
+
+    var filter = ctx.createBiquadFilter();
+    filter.type = "lowpass";
+    filter.frequency.value = 380;
+    filter.Q.value = 4;
+
+    // slow breathing of the filter
+    var lfo = ctx.createOscillator();
+    var lfoGain = ctx.createGain();
+    lfo.frequency.value = 0.07;
+    lfoGain.gain.value = 170;
+    lfo.connect(lfoGain).connect(filter.frequency);
+    lfo.start();
+
+    // low minor cluster, slightly detuned so it beats and unsettles
+    [55, 55.45, 82.41, 98.0, 110.6, 130.81].forEach(function (f, i) {
+      var o = ctx.createOscillator();
+      var g = ctx.createGain();
+      o.type = i < 3 ? "sawtooth" : "triangle";
+      o.frequency.value = f;
+      g.gain.value = i < 3 ? 0.16 : 0.07;
+      o.connect(g).connect(filter);
+      o.start();
+    });
+
+    // distant slow pulse
+    var pulse = ctx.createGain();
+    pulse.gain.value = 1;
+    var pl = ctx.createOscillator();
+    var plg = ctx.createGain();
+    pl.frequency.value = 0.18;
+    plg.gain.value = 0.25;
+    pl.connect(plg).connect(pulse.gain);
+    pl.start();
+
+    filter.connect(pulse).connect(master).connect(ctx.destination);
+  }
+
+  function startAudio() {
+    if (started) return;
+    started = true;
+    if (AUDIO_SRC) {
+      fileAudio = new Audio(AUDIO_SRC);
+      fileAudio.loop = true;
+      fileAudio.volume = 0.7;
+      fileAudio.play().catch(function () {});
+    } else if (YT_ID) {
+      var f = document.createElement("iframe");
+      f.src = "https://www.youtube.com/embed/" + encodeURIComponent(YT_ID) +
+        "?autoplay=1&loop=1&playlist=" + encodeURIComponent(YT_ID) + "&controls=0&playsinline=1";
+      f.allow = "autoplay; encrypted-media";
+      f.width = 200; f.height = 200;
+      f.title = "background music";
+      document.getElementById("yt-holder").appendChild(f);
+      document.getElementById("mute").style.display = "none";
+    } else {
+      startDrone();
+    }
+  }
+
+  document.getElementById("gate").addEventListener("click", function () {
+    document.body.classList.add("entered");
+    startAudio();
+  });
+
+  document.getElementById("mute").addEventListener("click", function () {
+    muted = !muted;
+    this.textContent = muted ? "listen" : "silence";
+    this.setAttribute("aria-pressed", String(muted));
+    if (fileAudio) fileAudio.muted = muted;
+    if (ctx) { muted ? ctx.suspend() : ctx.resume(); }
+  });
+})();
+</script>
+</body>
 </html>
